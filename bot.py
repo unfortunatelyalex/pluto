@@ -12,7 +12,7 @@ load_dotenv()
 intents = discord.Intents.default()
 intents.members = True
 
-client = commands.Bot(command_prefix='$')
+client = commands.Bot(command_prefix='#')
 
 @client.event
 async def on_ready():
@@ -21,5 +21,12 @@ async def on_ready():
     print(client.user.name)
     print(client.user.id)
     print('------')
+
+
+@client.command()
+async def hello(ctx):
+    await ctx.send('hello')
+
+
 
 client.run(os.getenv("TOKEN"))
