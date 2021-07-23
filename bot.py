@@ -1,7 +1,6 @@
 import os
 import discord
 import random
-from discord.channel import TextChannel
 from discord.ext import commands
 from discord.utils import get
 from dotenv import load_dotenv
