@@ -1,6 +1,7 @@
 import os
 import discord
 import random
+from discord.channel import TextChannel
 from discord.ext import commands
 from discord.utils import get
 from dotenv import load_dotenv
@@ -54,27 +55,22 @@ async def em(ctx):
 
 
 
-# REACTION ON EVERY MESSAGE FROM GIVEN USERID
-# IF NOT IN COMMENTS, OTHER COMMANDS WONT WORK :((((((
-# I NEED HELP WITH THIS
+# REACTION TO EVERY MESSAGE FROM GIVEN USERID
 
-# @bot.event
-# async def on_message(message):
-#     if message.author.id == 406456604825747466:
-#         await message.add_reaction(emoji)
-    
-#     if not message.author.id == 406456604825747466:
-#         return
+@bot.event
+async def on_message(message):
+    if message.author.id == 406456604825747466:
+        await message.add_reaction(emoji)
+
+    await bot.process_commands(message)
 
 
+# Simple clear message command
 
 @bot.command()
 @commands.has_permissions(manage_messages=True)
 async def clear(ctx, amount=4):
-    await ctx.channel.purge(limit=amount+1)
-
-
-
+    await ctx.channel.purge(limit=amount+1) 
 
 
 
