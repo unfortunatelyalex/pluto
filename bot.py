@@ -2,8 +2,9 @@ import os
 import discord
 import random
 import json
+import datetime
 from discord.ext import commands
-from discord.utils import get
+from discord.ext.commands import has_permissions, MissingPermissions
 from dotenv import load_dotenv
 
 
@@ -12,6 +13,10 @@ load_dotenv()
 intents = discord.Intents().all()
 intents.members = True
 emoji = '🤡'
+embed_footer = 'made with 💛 by alex.#6247'
+embed_footer_icon = "https://cdn.discordapp.com/avatars/791670415779954698/2a9cdb3b39a17dc0682572b806bd3ceb.webp?size=1024"
+missing_perms = "Unable to run this command.\n(MISSING_PERMS)\nIf you believe this could be a mistake, please contact your administrator."
+owner_id = 399668151475765258
 
 
 
@@ -113,11 +118,11 @@ async def changeprefix(ctx, prefixset = None):
 @bot.command(description='Simple embed message')
 async def em(ctx):
     embed=discord.Embed(title="Test embed message", description="testing my embed skills :)", color=random.randint(0, 0xffffff))
-    embed.set_author(name=f"{ctx.message.author}", url="https://static.thenounproject.com/png/2420170-200.png", icon_url="https://static.thenounproject.com/png/2420170-200.png")
+    embed.set_author(name=f"from {ctx.message.author}", url=f"{ctx.author.avatar_url}", icon_url=f"{ctx.author.avatar_url}")
     embed.set_thumbnail(url=f'{ctx.guild.icon_url}')
-    embed.add_field(name="FELD", value="WERT", inline=False)
-    embed.add_field(name="FELD 2", value="WERT 2", inline=False)
-    embed.set_footer(text="made with 💛 by alex.")
+    embed.add_field(name="FELD", value="WERT", inline=True)
+    embed.add_field(name="FELD 2", value="WERT 2", inline=True)
+    embed.set_footer(text=f"{embed_footer}", icon_url=f"{embed_footer_icon}")
     await ctx.send(embed=embed)
 
 
@@ -127,7 +132,7 @@ async def em(ctx):
 @bot.command(aliases=['key','api', 'apikey'], description='Shows the Token of this Bot')
 async def Token(message):
     if message.author.id != 399668151475765258:
-        await message.channel.send('You do not have permission to run this command')
+        await message.channel.send(f'{missing_perms}')
     
     if message.author.id == 399668151475765258:
         await message.channel.send('You got jebaited')
@@ -152,10 +157,10 @@ async def on_message(message):
 
 
 # Simple clear message command
-@bot.command()
+@bot.command(aliases = ['claer'])
 async def clear(ctx, amount=1):
     if (not ctx.author.guild_permissions.manage_messages):
-        await ctx.send('You do not have the permission to run this command.\nAsk your Administrator for help.')
+        await ctx.send(f'{missing_perms}')
         return
     await ctx.channel.purge(limit=amount+1)
 
@@ -163,7 +168,7 @@ async def clear(ctx, amount=1):
 
 
 
-@bot.command()
+@bot.command(aliases=['av, avatar, avatar, avtar, avatr'])
 async def avatar(ctx, member : discord.Member = None):
     if member is None:
         member = ctx.author
@@ -179,11 +184,42 @@ async def avatar(ctx, member : discord.Member = None):
 
 
 
+@bot.command(name="commands", description="Returns all commands available")
+async def commands(ctx):
+    commands = "```"
+    for command in bot.commands:
+        commands+=f"{command}\n"
+    commands+="```"
+    await ctx.send(commands)
 
 
 
 
 
+
+
+
+@bot.command(name = "restart", aliases = ["r", "retard", "retards", "rstart", "restat", "restar", "rstar", "rsatart", "restatr", "retar"], help = "Restarts the bot.")
+@has_permissions(manage_guild=True)
+async def restart(ctx):
+    ch = bot.get_channel(868576213013237800)
+    embed = discord.Embed(
+        title = f"{bot.user.name} is now restarting...",
+        color = random.randint(0, 0xffffff),
+        timestamp = datetime.datetime.now(datetime.timezone.utc)
+    )
+    embed.set_author(
+        name = ctx.author.name,
+        icon_url = ctx.author.avatar_url,
+    )                                                           # PERMISSION CHECK EINBAUEN
+    embed.set_footer(text =f"{embed_footer}",
+    icon_url=f"{embed_footer_icon}"
+    )
+
+    await ch.send(embed = embed)
+    
+    await ctx.message.add_reaction("✅")
+    await bot.close()
 
 
 
