@@ -87,7 +87,7 @@ async def on_guild_remove(guild):
 # Test command
 @bot.command(aliases=['hi'], description='Test if the bot is able to chat', help = "Says hello. What a nice bot.")
 async def hello(ctx):
-    await ctx.send('hello')
+    await ctx.send('hello :)')
 
 
 
