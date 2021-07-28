@@ -14,3 +14,6 @@ pluto is my personal discord bot I wrote in order to help me manage my server a 
 
 ### What pluto won't do
 1. Explain the aerodynamics of a cow.
+
+
+© 2021 Alexander Bonin, All Rights Reserved
