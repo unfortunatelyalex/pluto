@@ -4,9 +4,8 @@ import random
 import json
 import datetime
 from discord.ext import commands
-from discord.ext.commands import has_permissions, MissingPermissions
+from discord.ext.commands.core import is_owner
 from dotenv import load_dotenv
-
 
 load_dotenv()
 
@@ -15,8 +14,8 @@ intents.members = True
 emoji = '🤡'
 embed_footer = 'made with 💛 by alex.#6247'
 embed_footer_icon = "https://cdn.discordapp.com/avatars/791670415779954698/2a9cdb3b39a17dc0682572b806bd3ceb.webp?size=1024"
-missing_perms = "Unable to run this command.\n(MISSING_PERMS)\nIf you believe this could be a mistake, please contact your administrator."
-owner_id = 399668151475765258
+missing_perms = "Unable to run this command.\n(MissingPermissions)\nIf you believe this could be a mistake, please contact your administrator."
+ownererror = "You don't own this bot to run this command\n(NotOwner)\nIf you believe this could be a mistake, please contact your administrator."
 
 
 
@@ -32,7 +31,12 @@ def get_prefix(client, message):
 
 
 # Getting Prefix
-bot = commands.Bot(command_prefix= get_prefix, case_insensitive=True)
+bot = commands.Bot(command_prefix=get_prefix, owner_id = 399668151475765258, case_insensitive=True)
+
+
+
+
+
 
 
 
@@ -81,7 +85,7 @@ async def on_guild_remove(guild):
 
 
 # Test command
-@bot.command(aliases=['hi'], description='Test if the bot is able to chat')
+@bot.command(aliases=['hi'], description='Test if the bot is able to chat', help = "Says hello. What a nice bot.")
 async def hello(ctx):
     await ctx.send('hello')
 
@@ -90,10 +94,10 @@ async def hello(ctx):
 
 
 # Changeprefix command
-@bot.command(aliases=['prefix'])
-async def changeprefix(ctx, prefixset = None):
+@bot.command(aliases=['setprefix'], description="Usage: .prefix [NEW PREFIX]", help = "Changes the prefix. If empty, resets the prefix to default.")
+async def prefix(ctx, prefixset = None):
     if (not ctx.author.guild_permissions.manage_channels):
-        await ctx.send('nooooo')
+        await ctx.send(f'{missing_perms}')
         return
 
     if prefixset is None:
@@ -113,24 +117,8 @@ async def changeprefix(ctx, prefixset = None):
 
 
 
-
-# Simple Embed message
-@bot.command(description='Simple embed message')
-async def em(ctx):
-    embed=discord.Embed(title="Test embed message", description="testing my embed skills :)", color=random.randint(0, 0xffffff))
-    embed.set_author(name=f"from {ctx.message.author}", url=f"{ctx.author.avatar_url}", icon_url=f"{ctx.author.avatar_url}")
-    embed.set_thumbnail(url=f'{ctx.guild.icon_url}')
-    embed.add_field(name="FELD", value="WERT", inline=True)
-    embed.add_field(name="FELD 2", value="WERT 2", inline=True)
-    embed.set_footer(text=f"{embed_footer}", icon_url=f"{embed_footer_icon}")
-    await ctx.send(embed=embed)
-
-
-
-
-
-@bot.command(aliases=['key','api', 'apikey'], description='Shows the Token of this Bot')
-async def Token(message):
+@bot.command(aliases=['key','api', 'apikey'], description='Usage: .token', help="Shows the Token of this Bot")
+async def token(message):
     if message.author.id != 399668151475765258:
         await message.channel.send(f'{missing_perms}')
     
@@ -157,7 +145,7 @@ async def on_message(message):
 
 
 # Simple clear message command
-@bot.command(aliases = ['claer'])
+@bot.command(aliases = ['claer'], description="Usage: .clear [Amount of messages you want to delete]", help="Clears messages")
 async def clear(ctx, amount=1):
     if (not ctx.author.guild_permissions.manage_messages):
         await ctx.send(f'{missing_perms}')
@@ -168,7 +156,7 @@ async def clear(ctx, amount=1):
 
 
 
-@bot.command(aliases=['av, avatar, avatar, avtar, avatr'])
+@bot.command(aliases=['av, avatar, avatar, avtar, avatr'], description="Usage: .avatar [USER @]", help="Displays a users avatar")
 async def avatar(ctx, member : discord.Member = None):
     if member is None:
         member = ctx.author
@@ -184,7 +172,7 @@ async def avatar(ctx, member : discord.Member = None):
 
 
 
-@bot.command(name="commands", description="Returns all commands available")
+@bot.command(name="commands", description="Usage: .commands", help="Lists every command available")
 async def commands(ctx):
     commands = "```"
     for command in bot.commands:
@@ -199,24 +187,27 @@ async def commands(ctx):
 
 
 
-@bot.command(name = "restart", aliases = ["r", "retard", "retards", "rstart", "restat", "restar", "rstar", "rsatart", "restatr", "retar"], help = "Restarts the bot.")
-@has_permissions(manage_guild=True)
+@bot.command(pass_context=True, name = "restart", aliases = ["r"], description="Usage: .restart", help = "Restarts the bot.")
+@is_owner()
 async def restart(ctx):
-    ch = bot.get_channel(868576213013237800)
-    embed = discord.Embed(
+    ch = bot.get_channel(791670764143247420)
+    restartembed = discord.Embed(
         title = f"{bot.user.name} is now restarting...",
         color = random.randint(0, 0xffffff),
         timestamp = datetime.datetime.now(datetime.timezone.utc)
     )
-    embed.set_author(
+    restartembed.set_author(
         name = ctx.author.name,
         icon_url = ctx.author.avatar_url,
-    )                                                           # PERMISSION CHECK EINBAUEN
-    embed.set_footer(text =f"{embed_footer}",
+    )
+    restartembed.set_footer(text =f"{embed_footer}",
     icon_url=f"{embed_footer_icon}"
     )
+    # if (not ctx.author.:
+    #     await ctx.send(f'{ownererror}')           # TODO NOT OWNER CHECK
+    #     return
 
-    await ch.send(embed = embed)
+    await ch.send(embed = restartembed)
     
     await ctx.message.add_reaction("✅")
     await bot.close()
