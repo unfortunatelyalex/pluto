@@ -49,7 +49,12 @@ async def on_ready():
     print(discord.__version__)
     print('------')
     await bot.change_presence(activity=discord.Activity(type=5, name="a massive gangbang")) # Displays 'Competing in a massive gangbang'
-
+                                                    # type 0 = playing
+                                                    # type 1 = streaming
+                                                    # type 2 = listening to
+                                                    # type 3 = watching
+                                                    # type 4 = Custom (NOT SUPPORTED)
+                                                    # type 5 = competeting in
 
 
 
