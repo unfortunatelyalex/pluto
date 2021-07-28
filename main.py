@@ -15,7 +15,7 @@ emoji = '🤡'
 embed_footer = 'made with 💛 by alex.#6247'
 embed_footer_icon = "https://cdn.discordapp.com/avatars/791670415779954698/2a9cdb3b39a17dc0682572b806bd3ceb.webp?size=1024"
 missing_perms = "Unable to run this command.\n(MissingPermissions)\nIf you believe this could be a mistake, please contact your administrator."
-ownererror = "You don't own this bot to run this command\n(NotOwner)\nIf you believe this could be a mistake, please contact your administrator."
+not_owner = "You don't own this bot to run this command\n(NotOwner)\nIf you believe this could be a mistake, please contact your administrator."
 
 
 
@@ -117,6 +117,8 @@ async def prefix(ctx, prefixset = None):
 
 
 
+# Token command
+
 @bot.command(aliases=['key','api', 'apikey'], description='Usage: .token', help="Shows the Token of this Bot")
 async def token(message):
     if message.author.id != 399668151475765258:
@@ -204,7 +206,7 @@ async def restart(ctx):
     icon_url=f"{embed_footer_icon}"
     )
     # if (not ctx.author.:
-    #     await ctx.send(f'{ownererror}')           # TODO NOT OWNER CHECK
+    #     await ctx.send(f'{not_owner}')           # TODO NOT OWNER CHECK
     #     return
 
     await ch.send(embed = restartembed)
