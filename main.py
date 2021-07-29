@@ -9,18 +9,6 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-intents = discord.Intents().all()
-intents.members = True
-emoji = '🤡'
-embed_footer = 'made with 💛 by alex.#6247'
-embed_footer_icon = "https://cdn.discordapp.com/avatars/791670415779954698/2a9cdb3b39a17dc0682572b806bd3ceb.webp?size=1024"
-missing_perms = "Unable to run this command.\n(MissingPermissions)\nIf you believe this could be a mistake, please contact your administrator."
-not_owner = "You don't own this bot to run this command\n(NotOwner)\nIf you believe this could be a mistake, please contact your administrator."
-
-
-
-
-
 # Prefix load from .json file
 def get_prefix(client, message):
     with open('prefixes.json', 'r') as f:
@@ -28,13 +16,16 @@ def get_prefix(client, message):
 
     return prefixes[str(message.guild.id)]
 
-
-
 # Getting Prefix
 bot = commands.Bot(command_prefix=get_prefix, owner_id = 399668151475765258, case_insensitive=True)
 
-
-
+intents = discord.Intents().all()
+intents.members = True
+emoji = '🤡'
+embed_footer = 'made with 💛 by alex.#6247'
+embed_footer_icon = "https://cdn.discordapp.com/avatars/791670415779954698/2a9cdb3b39a17dc0682572b806bd3ceb.webp?size=1024"
+missing_perms = "Unable to run this command.\n(MissingPermissions)\nIf you believe this could be a mistake, please contact your administrator."
+not_owner = "You don't own this bot to run this command\n(NotOwner)\nIf you believe this could be a mistake, please contact your administrator."
 
 
 
@@ -55,6 +46,20 @@ async def on_ready():
                                                     # type 3 = watching
                                                     # type 4 = Custom (NOT SUPPORTED)
                                                     # type 5 = competeting in
+    logs = bot.get_channel(791670764143247420)
+    onstart = discord.Embed(
+        title = f"{bot.user.name} is now online",
+        color = random.randint(0, 0xffffff),
+        timestamp = datetime.datetime.now(datetime.timezone.utc)
+    )
+    onstart.set_author(
+        name = bot.user,
+        icon_url = f"{embed_footer_icon}",
+    )
+    onstart.set_footer(text =f"{embed_footer}",
+    icon_url=f"{embed_footer_icon}"
+    )
+    await logs.send(embed = onstart)
 
 
 
@@ -195,9 +200,8 @@ async def commands(ctx):
 
 
 @bot.command(pass_context=True, name = "restart", aliases = ["r"], description="Usage: .restart", help = "Restarts the bot.")
-@is_owner()
 async def restart(ctx):
-    ch = bot.get_channel(791670764143247420)
+    logs = bot.get_channel(791670764143247420)
     restartembed = discord.Embed(
         title = f"{bot.user.name} is now restarting...",
         color = random.randint(0, 0xffffff),
@@ -210,11 +214,12 @@ async def restart(ctx):
     restartembed.set_footer(text =f"{embed_footer}",
     icon_url=f"{embed_footer_icon}"
     )
-    # if (not ctx.author.:
-    #     await ctx.send(f'{not_owner}')           # TODO NOT OWNER CHECK
-    #     return
+    if ctx.author.id != 399668151475765258:
+        await ctx.send(f'{not_owner}')
+        await ctx.message.add_reaction(emoji)
+        return
 
-    await ch.send(embed = restartembed)
+    await logs.send(embed = restartembed)
     
     await ctx.message.add_reaction("✅")
     await bot.close()
