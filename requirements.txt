@@ -1,4 +1,0 @@
-discord.py
-python-dotenv
-discord
-pytest==6.2.4
