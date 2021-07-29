@@ -40,12 +40,12 @@ async def on_ready():
     print(discord.__version__)
     print('------')
     await bot.change_presence(activity=discord.Activity(type=5, name="a massive gangbang")) # Displays 'Competing in a massive gangbang'
-                                                    # type 0 = playing
-                                                    # type 1 = streaming
-                                                    # type 2 = listening to
-                                                    # type 3 = watching
-                                                    # type 4 = Custom (NOT SUPPORTED)
-                                                    # type 5 = competeting in
+                                                                                  # type 0 = playing
+                                                                                  # type 1 = streaming
+                                                                                  # type 2 = listening to
+                                                                                  # type 3 = watching
+                                                                                  # type 4 = Custom (NOT SUPPORTED)
+                                                                                  # type 5 = competeting in
     logs = bot.get_channel(791670764143247420)
     onstart = discord.Embed(
         title = f"{bot.user.name} is now online",
@@ -194,6 +194,37 @@ async def commands(ctx):
 
 
 
+
+
+# **ONLINE**
+@bot.command(description="Usage: .online", help="Changes the online status to online")
+async def online(ctx):
+    if ctx.author.id != 399668151475765258:
+        await ctx.send(f'{not_owner}')
+        await ctx.message.add_reaction(emoji)
+        return
+    await bot.change_presence(status=discord.Status.online, activity=discord.Activity(type=5, name="a massive gangbang"))
+    await ctx.message.add_reaction('🟢')
+
+# **IDLE**
+@bot.command(description="Usage: .idle", help="Changes the online status to idle")
+async def idle(ctx):
+    if ctx.author.id != 399668151475765258:
+        await ctx.send(f'{not_owner}')
+        await ctx.message.add_reaction(emoji)
+        return
+    await bot.change_presence(status=discord.Status.idle, activity=discord.Activity(type=5, name="a massive gangbang"))
+    await ctx.message.add_reaction('🟡')
+
+# **DO NOT DISTURB**
+@bot.command(description="Usage: .dnd", help="Changes the online status to dnd")
+async def dnd(ctx):
+    if ctx.author.id != 399668151475765258:
+        await ctx.send(f'{not_owner}')
+        await ctx.message.add_reaction(emoji)
+        return
+    await bot.change_presence(status=discord.Status.dnd, activity=discord.Activity(type=5, name="a massive gangbang"))
+    await ctx.message.add_reaction('🛑')
 
 
 
