@@ -168,7 +168,7 @@ async def clear_error(ctx, error):
 
 
 # AVATAR COMMAND
-@bot.command(aliases=['av, avatar, avatar, avtar, avatr'], description="Usage: .avatar [USER @]", help="Displays a users avatar")
+@bot.command(aliases=['a, av, avatar, avatar, avtar, avatr'], description="Usage: .avatar [USER @]", help="Displays a users avatar")
 async def avatar(ctx, member: discord.Member = None):
     if member is None:
         member = ctx.author
@@ -177,6 +177,7 @@ async def avatar(ctx, member: discord.Member = None):
 
     avatarEmbed = discord.Embed(title=f"{member.name}'s Avatar")
     avatarEmbed.set_image(url=memberAvatar)
+    avatarEmbed.set_footer(text=f"{embed_footer}", icon_url=f"{embed_footer_icon}")
 
     await ctx.send(embed=avatarEmbed)
 
