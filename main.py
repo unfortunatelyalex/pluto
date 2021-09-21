@@ -151,7 +151,7 @@ async def on_message(message):
 
 
 # CLEAR MESSAGES COMMAND
-@bot.command(aliases=['claer'], description="Usage: .clear [Amount of messages you want to delete]", help="Clears messages")
+@bot.command(aliases=['claer', 'c'], description="Usage: .clear [Amount of messages you want to delete]", help="Clears messages")
 async def clear(ctx, amount : int):
     if (not ctx.author.guild_permissions.manage_messages):
         await ctx.send(f'{missing_perms}')
@@ -168,14 +168,14 @@ async def clear_error(ctx, error):
 
 
 # AVATAR COMMAND
-@bot.command(aliases=['a, av, avatar, avatar, avtar, avatr'], description="Usage: .avatar [USER @]", help="Displays a users avatar")
+@bot.command(aliases=["a", "av", "avtar", "avatr"], description="Usage: .avatar [USER @]", help="Displays a users avatar")
 async def avatar(ctx, member: discord.Member = None):
     if member is None:
         member = ctx.author
 
     memberAvatar = member.avatar_url
 
-    avatarEmbed = discord.Embed(title=f"{member.name}'s Avatar")
+    avatarEmbed = discord.Embed(title=f"{member.name}'s Avatar", timestamp=datetime.datetime.now(datetime.timezone.utc))
     avatarEmbed.set_image(url=memberAvatar)
     avatarEmbed.set_footer(text=f"{embed_footer}", icon_url=f"{embed_footer_icon}")
 
