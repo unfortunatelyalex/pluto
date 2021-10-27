@@ -3,8 +3,12 @@ import discord
 import random
 import json
 import datetime
+from discord import user
+from discord.utils import get
+from discord import client
 from discord.ext import commands
 from discord.ext.commands import MissingRequiredArgument
+from discord.ext.commands.core import has_permissions
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -17,7 +21,7 @@ def get_prefix(client, message):
     return prefixes[str(message.guild.id)]
 
 # Getting Prefix
-bot = commands.Bot(command_prefix=get_prefix, owner_id=399668151475765258, case_insensitive=True)
+bot = commands.Bot(command_prefix=get_prefix, owner_id="399668151475765258" "", case_insensitive=True)
 
 intents = discord.Intents().all()
 intents.members = True
@@ -39,7 +43,7 @@ async def on_ready():
     print(f"User-ID = {bot.user.id}")
     print(discord.__version__)
     print('------')
-    await bot.change_presence(activity=discord.Activity(type=5, name="a massive gangbang")) # Displays 'Competing in a massive gangbang'
+    await bot.change_presence(activity=discord.Activity(type=2, name="your bullshit")) # Displays 'Competing in a massive gangbang'
                                        # playing      = type 0, name="NAME" 
                                        # streaming    = type 1, name="NAME", url=YOUTUBE/TWITCH
                                        # listening to = type 2, name="NAME" 
@@ -150,6 +154,18 @@ async def on_message(message):
 
 
 
+
+@bot.command(pass_context=True)
+@has_permissions(manage_messages = True)
+async def mute(ctx, member:discord.Member):
+    role = discord.utils.get(ctx.guild.roles, name='Mommy')
+    await member.add_roles(role)
+
+
+
+
+
+
 # CLEAR MESSAGES COMMAND
 @bot.command(aliases=['claer', 'c'], description="Usage: .clear [Amount of messages you want to delete]", help="Clears messages")
 async def clear(ctx, amount : int):
@@ -157,6 +173,15 @@ async def clear(ctx, amount : int):
         await ctx.send(f'{missing_perms}')
         return
     await ctx.channel.purge(limit=amount + 1)
+
+    # if clear.amount.int == '*':
+    #     await ctx.channel.purge()
+    
+
+@bot.command(aliases=['p'], description="Usage: .purge", help="Purges the whole channel")
+async def purge(ctx):
+  await ctx.channel.purge()
+
 @clear.error
 async def clear_error(ctx, error):
     if isinstance(error, MissingRequiredArgument):
@@ -248,7 +273,7 @@ async def playing_error(ctx, error):
 
 
 # LISTENING TO
-@bot.command(description="Usage: .listening [VIDEO]", help="Changes the bots activity status to 'listening to ...'")
+@bot.command(description="Usage: .listening [SONG]", help="Changes the bots activity status to 'listening to ...'")
 async def listening(ctx, *, message):
     if ctx.author.id != 399668151475765258:
         await ctx.send(f'{not_owner}')
@@ -278,7 +303,7 @@ async def watching_error(ctx, error):
 
 
 # COMPETING IN
-@bot.command(description="Usage: .competing [VIDEO]", help="Changes the bots activity status to 'competing in ...'")
+@bot.command(description="Usage: .competing [ACTIVITY]", help="Changes the bots activity status to 'competing in ...'")
 async def compete(ctx, *, message):
     if ctx.author.id != 399668151475765258:
         await ctx.send(f'{not_owner}')
@@ -289,7 +314,7 @@ async def compete(ctx, *, message):
 @compete.error
 async def compete_error(ctx, error):
     if isinstance(error, MissingRequiredArgument):
-        await ctx.send('Please specify the activity in which I should compete')
+        await ctx.send('Please specify the activity I should compete in')
 
 
 
@@ -327,3 +352,21 @@ async def restart(ctx):
 
 
 bot.run(os.getenv("TOKEN"))
+
+
+
+
+
+
+
+
+
+
+# GANZ NETT MUSS ABER NICHT SEIN
+
+# @bot.command(pass_context=True)
+# @has_permissions(ban_members=True)
+# async def ban(ctx, member : discord.Member, *, reason = None):
+#         await member.send(f"You have been banned in `{ctx.guild}`\nReason: `{reason}`") 
+#         await member.ban(reason = reason)
+#         await ctx.send(f"{member} has been successfully banned.") 
