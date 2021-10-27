@@ -3,9 +3,7 @@ import discord
 import random
 import json
 import datetime
-from discord import user
 from discord.utils import get
-from discord import client
 from discord.ext import commands
 from discord.ext.commands import MissingRequiredArgument
 from discord.ext.commands.core import has_permissions
