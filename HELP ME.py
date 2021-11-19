@@ -1,13 +1,22 @@
 import os
-import discord
+import nextcord
 import random
 import json
 import datetime
-from discord.utils import get
-from discord.ext import commands
-from discord.ext.commands import MissingRequiredArgument
-from discord.ext.commands.core import has_permissions
+import logging
+from nextcord.utils import get
+from nextcord.ext import commands
+from nextcord.ext.commands import MissingRequiredArgument
+from nextcord.ext.commands.core import has_permissions
 from dotenv import load_dotenv
+
+# LOG
+logger = logging.getLogger('nextcord')
+logger.setLevel(logging.DEBUG)
+handler = logging.FileHandler(filename='nextcord.log', encoding='utf-8', mode='w')
+handler.setFormatter(logging.Formatter('%(name)s: %(message)s'))
+logger.addHandler(handler)
+
 
 load_dotenv()
 
@@ -19,9 +28,9 @@ def get_prefix(client, message):
     return prefixes[str(message.guild.id)]
 
 # Getting Prefix
-bot = commands.Bot(command_prefix=get_prefix, owner_id="399668151475765258" "", case_insensitive=True)
+bot = commands.Bot(command_prefix=get_prefix, owner_id="399668151475765258", case_insensitive=True)
 
-intents = discord.Intents().all()
+intents = nextcord.Intents().all()
 intents.members = True
 emoji = '🤡'
 embed_footer = 'made with 💛 by alex.#6247'
@@ -36,12 +45,12 @@ not_owner = "You don't own this bot to run this command\n(NotOwner)\nIf you beli
 # Ready up message and activity status
 @bot.event
 async def on_ready():
-    print('------')
-    print(f"Logged in as {bot.user} ")
-    print(f"User-ID = {bot.user.id}")
-    print(discord.__version__)
-    print('------')
-    await bot.change_presence(activity=discord.Activity(type=2, name="your bullshit")) # Displays 'Competing in a massive gangbang'
+    print('--------------------------------')
+    print(f"     Logged in as {bot.user} ")
+    print(f" User-ID = {bot.user.id}")
+    print(f"            {nextcord.__version__}")
+    print('--------------------------------')
+    await bot.change_presence(activity=nextcord.Activity(type=2, name="your bullshit")) # Displays 'Competing in a massive gangbang'
                                        # playing      = type 0, name="NAME" 
                                        # streaming    = type 1, name="NAME", url=YOUTUBE/TWITCH
                                        # listening to = type 2, name="NAME" 
@@ -49,7 +58,7 @@ async def on_ready():
                                        # CUSTOM       = type 4 (NOT SUPPORTED) 
                                        # COMPETING IN = type 5, name="NAME" 
     logs = bot.get_channel(791670764143247420)
-    onstart = discord.Embed(
+    onstart = nextcord.Embed(
         title=f"{bot.user.name} is now online",
         color=random.randint(0, 0xffffff),
         timestamp=datetime.datetime.now(datetime.timezone.utc)
@@ -155,10 +164,53 @@ async def on_message(message):
 
 @bot.command(pass_context=True)
 @has_permissions(manage_messages = True)
-async def mute(ctx, member:discord.Member):
-    role = discord.utils.get(ctx.guild.roles, name='Mommy')
+async def mute(ctx, member:nextcord.Member):
+    role = nextcord.utils.get(ctx.guild.roles, name='Mommy')
     await member.add_roles(role)
 
+@bot.command(pass_context=True)
+@has_permissions(manage_messages = True)
+async def unmute(ctx, member:nextcord.Member):
+    role = nextcord.utils.get(ctx.guild.roles, name='Mommy')
+    await member.remove_roles(role)
+
+
+
+
+
+
+@bot.command()
+async def say(ctx, channel: nextcord.TextChannel, *, message):
+		await channel.send(f"{message}")
+
+
+
+
+
+
+
+@bot.command(pass_context=True, aliases=['em'], description="Usage: .embed [YOUR TEST TEXT]", help="Embedded test message")
+async def embed(ctx, *, message = None):
+    if message is None:
+        message = "not defined"
+    embed = nextcord.Embed(
+        title=f"Test message includes: {message}",
+        color=random.randint(0, 0xffffff),
+        timestamp=datetime.datetime.now(datetime.timezone.utc)
+    )
+    embed.set_author(
+        name=ctx.author.name,
+        icon_url=ctx.author.avatar.url,
+    )
+    embed.set_footer(
+        text=f"{embed_footer}",
+        icon_url=f"{embed_footer_icon}"
+    )
+    embed.add_field(
+        name="text1",
+        value="textvalue1"
+    )
+    await ctx.send(embed=embed)
 
 
 
@@ -177,7 +229,7 @@ async def clear(ctx, amount : int):
     
 
 @bot.command(aliases=['p'], description="Usage: .purge", help="Purges the whole channel")
-async def purge(ctx):
+async def purge(ctx ):
   await ctx.channel.purge()
 
 @clear.error
@@ -192,13 +244,13 @@ async def clear_error(ctx, error):
 
 # AVATAR COMMAND
 @bot.command(aliases=["a", "av", "avtar", "avatr"], description="Usage: .avatar [USER @]", help="Displays a users avatar")
-async def avatar(ctx, member: discord.Member = None):
+async def avatar(ctx, member: nextcord.Member = None):
     if member is None:
         member = ctx.author
 
-    memberAvatar = member.avatar_url
+    memberAvatar = member.avatar.url
 
-    avatarEmbed = discord.Embed(title=f"{member.name}'s Avatar", timestamp=datetime.datetime.now(datetime.timezone.utc))
+    avatarEmbed = nextcord.Embed(title=f"{member.name}'s Avatar", timestamp=datetime.datetime.now(datetime.timezone.utc))
     avatarEmbed.set_image(url=memberAvatar)
     avatarEmbed.set_footer(text=f"{embed_footer}", icon_url=f"{embed_footer_icon}")
 
@@ -228,7 +280,7 @@ async def online(ctx):
         await ctx.send(f'{not_owner}')
         await ctx.message.add_reaction(emoji)
         return
-    await bot.change_presence(status=discord.Status.online,activity=discord.Activity(type=5, name="a massive gangbang"))
+    await bot.change_presence(status=nextcord.Status.online,activity=nextcord.Activity(type=5, name="your bullshit"))
     await ctx.message.add_reaction('🟢')
 
 # **IDLE**
@@ -238,7 +290,7 @@ async def idle(ctx):
         await ctx.send(f'{not_owner}')
         await ctx.message.add_reaction(emoji)
         return
-    await bot.change_presence(status=discord.Status.idle, activity=discord.Activity(type=5, name="a massive gangbang"))
+    await bot.change_presence(status=nextcord.Status.idle, activity=nextcord.Activity(type=5, name="your bullshit"))
     await ctx.message.add_reaction('🟡')
 
 # **DO NOT DISTURB**
@@ -248,7 +300,7 @@ async def dnd(ctx):
         await ctx.send(f'{not_owner}')
         await ctx.message.add_reaction(emoji)
         return
-    await bot.change_presence(status=discord.Status.dnd, activity=discord.Activity(type=5, name="a massive gangbang"))
+    await bot.change_presence(status=nextcord.Status.dnd, activity=nextcord.Activity(type=5, name="your bullshit"))
     await ctx.message.add_reaction('🛑')
 
 
@@ -262,7 +314,7 @@ async def playing(ctx, *, message):
         await ctx.send(f'{not_owner}')
         await ctx.message.add_reaction(emoji)
         return
-    await bot.change_presence(activity=discord.Activity(type=0, name=message))
+    await bot.change_presence(activity=nextcord.Activity(type=0, name=message))
     await ctx.message.add_reaction('👌')
 @playing.error
 async def playing_error(ctx, error):
@@ -277,7 +329,7 @@ async def listening(ctx, *, message):
         await ctx.send(f'{not_owner}')
         await ctx.message.add_reaction(emoji)
         return
-    await bot.change_presence(activity=discord.Activity(type=2, name=message))
+    await bot.change_presence(activity=nextcord.Activity(type=2, name=message))
     await ctx.message.add_reaction('👌')
 @listening.error
 async def listening_error(ctx, error):
@@ -292,7 +344,7 @@ async def watching(ctx, *, message):
         await ctx.send(f'{not_owner}')
         await ctx.message.add_reaction(emoji)
         return
-    await bot.change_presence(activity=discord.Activity(type=3, name=message))
+    await bot.change_presence(activity=nextcord.Activity(type=3, name=message))
     await ctx.message.add_reaction('👌')
 @watching.error
 async def watching_error(ctx, error):
@@ -307,7 +359,7 @@ async def compete(ctx, *, message):
         await ctx.send(f'{not_owner}')
         await ctx.message.add_reaction(emoji)
         return
-    await bot.change_presence(activity=discord.Activity(type=5, name=message))
+    await bot.change_presence(activity=nextcord.Activity(type=5, name=message))
     await ctx.message.add_reaction('👌')
 @compete.error
 async def compete_error(ctx, error):
@@ -323,15 +375,15 @@ async def compete_error(ctx, error):
 
 @bot.command(pass_context=True, name="restart", aliases=["r", "reset"], description="Usage: .restart", help="Restarts the bot.")
 async def restart(ctx):
-    logs = bot.get_channel(791670764143247420)
-    restartembed = discord.Embed(
+    logs = bot.get_channel(791670764143247420)     #UM IN LOG CHANNEL ZU POSTEN
+    restartembed = nextcord.Embed(
         title=f"{bot.user.name} is now restarting...",
         color=random.randint(0, 0xffffff),
         timestamp=datetime.datetime.now(datetime.timezone.utc)
     )
     restartembed.set_author(
         name=ctx.author.name,
-        icon_url=ctx.author.avatar_url,
+        icon_url=ctx.author.avatar.url,
     )
     restartembed.set_footer(
         text=f"{embed_footer}",
@@ -341,8 +393,9 @@ async def restart(ctx):
         await ctx.send(f'{not_owner}')
         await ctx.message.add_reaction(emoji)
         return
-
-    await logs.send(embed=restartembed)
+        
+    await logs.send(embed=restartembed)             #UM IN LOG CHANNEL ZU POSTEN
+    # await ctx.send(embed=restartembed)              #UM IN DEN GLEICHEN CHANNEL ZU POSTEN
 
     await ctx.message.add_reaction("✅")
     await bot.close()
@@ -364,7 +417,7 @@ bot.run(os.getenv("TOKEN"))
 
 # @bot.command(pass_context=True)
 # @has_permissions(ban_members=True)
-# async def ban(ctx, member : discord.Member, *, reason = None):
+# async def ban(ctx, member : nextcord.Member, *, reason = None):
 #         await member.send(f"You have been banned in `{ctx.guild}`\nReason: `{reason}`") 
 #         await member.ban(reason = reason)
 #         await ctx.send(f"{member} has been successfully banned.") 
