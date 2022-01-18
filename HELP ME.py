@@ -32,11 +32,14 @@ bot = commands.Bot(command_prefix=get_prefix, owner_id="399668151475765258", cas
 
 intents = nextcord.Intents().all()
 intents.members = True
-emoji = '🤡'
+clown1 = '🤡'
+clown2 = '<:literalclown:903780300839088188>'
+clown3 = '<a:thumbsclown:931491107546738729>'
+clown4 = '<:deadclown:931491107148300318>'
 embed_footer = 'made with 💛 by alex.#6247'
 embed_footer_icon = "https://cdn.discordapp.com/avatars/791670415779954698/2a9cdb3b39a17dc0682572b806bd3ceb.webp?size=1024"
-missing_perms = "Unable to run this command.\n(MissingPermissions)\nIf you believe this could be a mistake, please contact your administrator."
-not_owner = "You don't own this bot to run this command\n(NotOwner)\nIf you believe this could be a mistake, please contact your administrator."
+missing_perms = "Unable to run this command.\nReason: (MissingPermissions)\nIf you believe this could be a mistake, please contact your administrator."
+not_owner = "You don't own this bot to run this command\nReason: (NotOwner)\nIf you believe this could be a mistake, please contact your administrator."
 
 
 
@@ -48,7 +51,7 @@ async def on_ready():
     print('--------------------------------')
     print(f"     Logged in as {bot.user} ")
     print(f" User-ID = {bot.user.id}")
-    print(f"            {nextcord.__version__}")
+    print(f"      Version = {nextcord.__version__}")
     print('--------------------------------')
     await bot.change_presence(activity=nextcord.Activity(type=2, name="your bullshit")) # Displays 'Competing in a massive gangbang'
                                        # playing      = type 0, name="NAME" 
@@ -60,6 +63,7 @@ async def on_ready():
     logs = bot.get_channel(791670764143247420)
     onstart = nextcord.Embed(
         title=f"{bot.user.name} is now online",
+        description="<@399668151475765258> read this <:point:916333529623846922>",
         color=random.randint(0, 0xffffff),
         timestamp=datetime.datetime.now(datetime.timezone.utc)
     )
@@ -97,6 +101,12 @@ async def on_guild_remove(guild):
         json.dump(prefixes, f, indent=4)
 
 
+# bot.remove_command('help')
+
+# @bot.command()
+# async def help(ctx):
+#     await ctx.send("Not yet implemented")
+#     return
 
 
 
@@ -114,6 +124,10 @@ async def hello(ctx):
 async def prefix(ctx, prefixset=None):
     if (not ctx.author.guild_permissions.administrator):
         await ctx.send(f'{missing_perms}')
+        await ctx.message.add_reaction(clown1)
+        await ctx.message.add_reaction(clown2)
+        await ctx.message.add_reaction(clown3)
+        await ctx.message.add_reaction(clown4)
         return
 
     if prefixset is None:
@@ -127,50 +141,79 @@ async def prefix(ctx, prefixset=None):
     with open('prefixes.json', 'w') as f:
         json.dump(prefixes, f, indent=4)
 
-    await ctx.send(f'The bot prefix has been changed to ``{prefixset}``')
+        await ctx.send(f'The bots prefix has been reset to ``{prefixset}``')
+        await ctx.message.add_reaction("✅")
+        return
+
+        await ctx.send(f'The bots prefix has been changed to ``{prefixset}``')
+        await ctx.message.add_reaction("✅")
 
 
 
 
 
 # Token command
-@bot.command(aliases=['key', 'api', 'apikey'], description='Usage: .token', help="Shows the Token of this Bot")
-async def token(message):
-    if message.author.id != 399668151475765258:
-        await message.channel.send(f'{missing_perms}')
+@bot.command(aliases=['key', 'api', 'apikey'], description='Usage: .token', help="Try me")
+async def token(ctx):
+    if ctx.author.id != 399668151475765258:
+        await ctx.channel.send(f'{not_owner}')
+        await ctx.message.add_reaction(clown1)
+        await ctx.message.add_reaction(clown2)
+        await ctx.message.add_reaction(clown3)
+        await ctx.message.add_reaction(clown4)
 
-    if message.author.id == 399668151475765258:
-        await message.channel.send('You got jebaited')
+    if ctx.author.id == 399668151475765258:
+        await ctx.channel.send('You got jebaited')
 
 
 
 
 
 # REACTION TO EVERY MESSAGE FROM GIVEN USERID
-@bot.event
-async def on_message(message):
-    if message.author.id == 406456604825747466:
-        await message.add_reaction(emoji)
+# @bot.event
+# async def on_message(message):
+#     if message.author.id == 406456604825747466:       # Miranda
+#         await message.add_reaction(clown1)
+#         await ctx.message.add_reaction(clown2)
+#         await ctx.message.add_reaction(clown3)
+#         await ctx.message.add_reaction(clown4)
 
-    if message.author.id == 332945969492656129:
-        await message.add_reaction(emoji)
+#     if message.author.id == 332945969492656129:       # ????
+#         await message.add_reaction(clown1)
+#         await ctx.message.add_reaction(clown2)
+#         await ctx.message.add_reaction(clown3)
+#         await ctx.message.add_reaction(clown4)
 
-    await bot.process_commands(message)
+#     await bot.process_commands(message)
 
 
 
 
 
 
-@bot.command(pass_context=True)
+@bot.command(description='Usage: .mute [@USER]', help="TEMPORARILY DISABLED")
 @has_permissions(manage_messages = True)
 async def mute(ctx, member:nextcord.Member):
+    if ctx.author.id != 399668151475765258:
+        await ctx.channel.send(f'{not_owner}')
+        await ctx.message.add_reaction(clown1)
+        await ctx.message.add_reaction(clown2)
+        await ctx.message.add_reaction(clown3)
+        await ctx.message.add_reaction(clown4)
+        return
     role = nextcord.utils.get(ctx.guild.roles, name='Mommy')
     await member.add_roles(role)
 
-@bot.command(pass_context=True)
+@bot.command(description='Usage: .unmute [@USER]', help="TEMPORARILY DISABLED")
 @has_permissions(manage_messages = True)
 async def unmute(ctx, member:nextcord.Member):
+    if ctx.author.id != 399668151475765258:
+        await ctx.channel.send(f'{not_owner}')
+        await ctx.message.add_reaction(clown1)
+        await ctx.message.add_reaction(clown2)
+        await ctx.message.add_reaction(clown3)
+        await ctx.message.add_reaction(clown4)
+        return
     role = nextcord.utils.get(ctx.guild.roles, name='Mommy')
     await member.remove_roles(role)
 
@@ -179,9 +222,16 @@ async def unmute(ctx, member:nextcord.Member):
 
 
 
-@bot.command()
+@bot.command(description='Usage: .say [#CHANNEL] [MESSAGE]', help="Make the bot say something in a specific channel")
 async def say(ctx, channel: nextcord.TextChannel, *, message):
-		await channel.send(f"{message}")
+    if ctx.author.id != 399668151475765258:
+        await ctx.channel.send(f'{not_owner}')
+        await ctx.message.add_reaction(clown1)
+        await ctx.message.add_reaction(clown2)
+        await ctx.message.add_reaction(clown3)
+        await ctx.message.add_reaction(clown4)
+        return
+    await channel.send(f"{message}")
 
 
 
@@ -189,8 +239,16 @@ async def say(ctx, channel: nextcord.TextChannel, *, message):
 
 
 
-@bot.command(pass_context=True, aliases=['em'], description="Usage: .embed [YOUR TEST TEXT]", help="Embedded test message")
-async def embed(ctx, *, message = None):
+@bot.command(aliases=['em'], description="Usage: .embed [YOUR TEXT]", help="Embedded test message")
+async def embed(ctx, message = None, name = None, value = None):
+    if ctx.author.id != 399668151475765258:
+      await ctx.send(f'{not_owner}')
+      await ctx.message.add_reaction(clown1)
+      await ctx.message.add_reaction(clown2)
+      await ctx.message.add_reaction(clown3)
+      await ctx.message.add_reaction(clown4)
+      return
+    
     if message is None:
         message = "not defined"
     embed = nextcord.Embed(
@@ -207,8 +265,8 @@ async def embed(ctx, *, message = None):
         icon_url=f"{embed_footer_icon}"
     )
     embed.add_field(
-        name="text1",
-        value="textvalue1"
+        name=f"{name}",
+        value=f"{value}"
     )
     await ctx.send(embed=embed)
 
@@ -221,6 +279,10 @@ async def embed(ctx, *, message = None):
 async def clear(ctx, amount : int):
     if (not ctx.author.guild_permissions.manage_messages):
         await ctx.send(f'{missing_perms}')
+        await ctx.message.add_reaction(clown1)
+        await ctx.message.add_reaction(clown2)
+        await ctx.message.add_reaction(clown3)
+        await ctx.message.add_reaction(clown4)
         return
     await ctx.channel.purge(limit=amount + 1)
 
@@ -230,7 +292,14 @@ async def clear(ctx, amount : int):
 
 @bot.command(aliases=['p'], description="Usage: .purge", help="Purges the whole channel")
 async def purge(ctx ):
-  await ctx.channel.purge()
+    if ctx.author.id != 399668151475765258:
+        await ctx.send(f'{not_owner}')
+        await ctx.message.add_reaction(clown1)
+        await ctx.message.add_reaction(clown2)
+        await ctx.message.add_reaction(clown3)
+        await ctx.message.add_reaction(clown4)
+        return
+    await ctx.channel.purge()
 
 @clear.error
 async def clear_error(ctx, error):
@@ -260,14 +329,19 @@ async def avatar(ctx, member: nextcord.Member = None):
 
 
 
-# COMMANDS COMMAND
-@bot.command(name="commands", description="Usage: .commands", help="Lists every command available")
-async def commands(ctx):
-    commands = "```"
-    for command in bot.commands:
-        commands += f"{command}\n"
-    commands += "```"
-    await ctx.send(commands)
+
+# BALLS (FOR ZARA)
+@bot.command(aliases=["ball"], description="Usage: .balls", help="A command just for Zara")
+async def balls(ctx):
+    await ctx.message.add_reaction("<:balls:931483626913280000>")
+    await ctx.message.add_reaction("<:caniholdyourballs:931486728173281320>")
+    await ctx.message.add_reaction("<:therockraisedbrow:919887658661081088>")
+    await ctx.message.add_reaction("<:idkbruh:931486728420724767>")
+    await ctx.message.add_reaction("<a:spongepls:931486730517901357>")
+    await ctx.message.add_reaction("<a:veryevil:931486730354303026>")
+    await ctx.message.add_reaction("<:LETSGOOOOOOOOOO:931486729255419924>")
+
+
 
 
 
@@ -278,9 +352,12 @@ async def commands(ctx):
 async def online(ctx):
     if ctx.author.id != 399668151475765258:
         await ctx.send(f'{not_owner}')
-        await ctx.message.add_reaction(emoji)
+        await ctx.message.add_reaction(clown1)
+        await ctx.message.add_reaction(clown2)
+        await ctx.message.add_reaction(clown3)
+        await ctx.message.add_reaction(clown4)
         return
-    await bot.change_presence(status=nextcord.Status.online,activity=nextcord.Activity(type=5, name="your bullshit"))
+    await bot.change_presence(status=nextcord.Status.online,activity=nextcord.Activity(type=2, name="your bullshit"))
     await ctx.message.add_reaction('🟢')
 
 # **IDLE**
@@ -288,9 +365,12 @@ async def online(ctx):
 async def idle(ctx):
     if ctx.author.id != 399668151475765258:
         await ctx.send(f'{not_owner}')
-        await ctx.message.add_reaction(emoji)
+        await ctx.message.add_reaction(clown1)
+        await ctx.message.add_reaction(clown2)
+        await ctx.message.add_reaction(clown3)
+        await ctx.message.add_reaction(clown4)
         return
-    await bot.change_presence(status=nextcord.Status.idle, activity=nextcord.Activity(type=5, name="your bullshit"))
+    await bot.change_presence(status=nextcord.Status.idle, activity=nextcord.Activity(type=2, name="your bullshit"))
     await ctx.message.add_reaction('🟡')
 
 # **DO NOT DISTURB**
@@ -298,10 +378,26 @@ async def idle(ctx):
 async def dnd(ctx):
     if ctx.author.id != 399668151475765258:
         await ctx.send(f'{not_owner}')
-        await ctx.message.add_reaction(emoji)
+        await ctx.message.add_reaction(clown1)
+        await ctx.message.add_reaction(clown2)
+        await ctx.message.add_reaction(clown3)
+        await ctx.message.add_reaction(clown4)
         return
-    await bot.change_presence(status=nextcord.Status.dnd, activity=nextcord.Activity(type=5, name="your bullshit"))
-    await ctx.message.add_reaction('🛑')
+    await bot.change_presence(status=nextcord.Status.dnd, activity=nextcord.Activity(type=2, name="your bullshit"))
+    await ctx.message.add_reaction('🔴')
+
+# **INVISIBLE**
+@bot.command(aliases=["inv"], description="Usage: .invisible", help="Changes the online status to invisible")
+async def invisible(ctx):
+    if ctx.author.id != 399668151475765258:
+        await ctx.send(f'{not_owner}')
+        await ctx.message.add_reaction(clown1)
+        await ctx.message.add_reaction(clown2)
+        await ctx.message.add_reaction(clown3)
+        await ctx.message.add_reaction(clown4)
+        return
+    await bot.change_presence(status=nextcord.Status.invisible, activity=nextcord.Activity(type=2, name="your bullshit"))
+    await ctx.message.add_reaction('⚪')
 
 
 
@@ -312,7 +408,10 @@ async def dnd(ctx):
 async def playing(ctx, *, message):
     if ctx.author.id != 399668151475765258:
         await ctx.send(f'{not_owner}')
-        await ctx.message.add_reaction(emoji)
+        await ctx.message.add_reaction(clown1)
+        await ctx.message.add_reaction(clown2)
+        await ctx.message.add_reaction(clown3)
+        await ctx.message.add_reaction(clown4)
         return
     await bot.change_presence(activity=nextcord.Activity(type=0, name=message))
     await ctx.message.add_reaction('👌')
@@ -327,7 +426,10 @@ async def playing_error(ctx, error):
 async def listening(ctx, *, message):
     if ctx.author.id != 399668151475765258:
         await ctx.send(f'{not_owner}')
-        await ctx.message.add_reaction(emoji)
+        await ctx.message.add_reaction(clown1)
+        await ctx.message.add_reaction(clown2)
+        await ctx.message.add_reaction(clown3)
+        await ctx.message.add_reaction(clown4)
         return
     await bot.change_presence(activity=nextcord.Activity(type=2, name=message))
     await ctx.message.add_reaction('👌')
@@ -342,7 +444,10 @@ async def listening_error(ctx, error):
 async def watching(ctx, *, message):
     if ctx.author.id != 399668151475765258:
         await ctx.send(f'{not_owner}')
-        await ctx.message.add_reaction(emoji)
+        await ctx.message.add_reaction(clown1)
+        await ctx.message.add_reaction(clown2)
+        await ctx.message.add_reaction(clown3)
+        await ctx.message.add_reaction(clown4)
         return
     await bot.change_presence(activity=nextcord.Activity(type=3, name=message))
     await ctx.message.add_reaction('👌')
@@ -357,7 +462,10 @@ async def watching_error(ctx, error):
 async def compete(ctx, *, message):
     if ctx.author.id != 399668151475765258:
         await ctx.send(f'{not_owner}')
-        await ctx.message.add_reaction(emoji)
+        await ctx.message.add_reaction(clown1)
+        await ctx.message.add_reaction(clown2)
+        await ctx.message.add_reaction(clown3)
+        await ctx.message.add_reaction(clown4)
         return
     await bot.change_presence(activity=nextcord.Activity(type=5, name=message))
     await ctx.message.add_reaction('👌')
@@ -373,7 +481,42 @@ async def compete_error(ctx, error):
 
 
 
-@bot.command(pass_context=True, name="restart", aliases=["r", "reset"], description="Usage: .restart", help="Restarts the bot.")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+@bot.command(name="restart", aliases=["r", "reset"], description="Usage: .restart", help="Restarts the bot.")
 async def restart(ctx):
     logs = bot.get_channel(791670764143247420)     #UM IN LOG CHANNEL ZU POSTEN
     restartembed = nextcord.Embed(
@@ -391,7 +534,10 @@ async def restart(ctx):
     )
     if ctx.author.id != 399668151475765258:
         await ctx.send(f'{not_owner}')
-        await ctx.message.add_reaction(emoji)
+        await ctx.message.add_reaction(clown1)
+        await ctx.message.add_reaction(clown2)
+        await ctx.message.add_reaction(clown3)
+        await ctx.message.add_reaction(clown4)
         return
         
     await logs.send(embed=restartembed)             #UM IN LOG CHANNEL ZU POSTEN
@@ -415,7 +561,7 @@ bot.run(os.getenv("TOKEN"))
 
 # GANZ NETT MUSS ABER NICHT SEIN
 
-# @bot.command(pass_context=True)
+# @bot.command()
 # @has_permissions(ban_members=True)
 # async def ban(ctx, member : nextcord.Member, *, reason = None):
 #         await member.send(f"You have been banned in `{ctx.guild}`\nReason: `{reason}`") 
