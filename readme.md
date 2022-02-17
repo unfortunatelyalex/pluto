@@ -1,6 +1,6 @@
 # pluto
 ### What is pluto?
-pluto is my personal discord bot I wrote in order to help me manage my server a bit better.
+pluto is my personal discord bot I wrote in order to help me "manage" my server a bit better.
  
 ### pluto's functionalities
 1. Clearing messages.
@@ -16,4 +16,9 @@ pluto is my personal discord bot I wrote in order to help me manage my server a 
 ### What pluto won't do
 1. Explain the aerodynamics of a cow.
 
-# 
+
+
+# Planned
+- Virustotal API
+- Addon.to API
+- Logging things
