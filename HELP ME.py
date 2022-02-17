@@ -3,19 +3,11 @@ import nextcord
 import random
 import json
 import datetime
-import logging
 from nextcord.utils import get
 from nextcord.ext import commands
 from nextcord.ext.commands import MissingRequiredArgument
 from nextcord.ext.commands.core import has_permissions
 from dotenv import load_dotenv
-
-# LOG
-logger = logging.getLogger('nextcord')
-logger.setLevel(logging.DEBUG)
-handler = logging.FileHandler(filename='nextcord.log', encoding='utf-8', mode='w')
-handler.setFormatter(logging.Formatter('%(name)s: %(message)s'))
-logger.addHandler(handler)
 
 
 load_dotenv()
@@ -130,6 +122,8 @@ async def prefix(ctx, prefixset=None):
         await ctx.message.add_reaction(clown4)
         return
 
+
+
     if prefixset is None:
         prefixset = '.'
 
@@ -141,13 +135,11 @@ async def prefix(ctx, prefixset=None):
     with open('prefixes.json', 'w') as f:
         json.dump(prefixes, f, indent=4)
 
-        await ctx.send(f'The bots prefix has been reset to ``{prefixset}``')
-        await ctx.message.add_reaction("✅")
-        return
-
         await ctx.send(f'The bots prefix has been changed to ``{prefixset}``')
         await ctx.message.add_reaction("✅")
+    
 
+        
 
 
 
@@ -473,7 +465,6 @@ async def compete(ctx, *, message):
 async def compete_error(ctx, error):
     if isinstance(error, MissingRequiredArgument):
         await ctx.send('Please specify the activity I should compete in')
-
 
 
 
