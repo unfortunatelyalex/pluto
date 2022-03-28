@@ -2,6 +2,8 @@
 *.bat
 prefixes.json
 *.bak
+*.exe
+*.json
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
