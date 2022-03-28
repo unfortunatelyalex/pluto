@@ -1,12 +1,14 @@
 # pluto
 ### What is pluto?
-pluto is my personal discord bot I wrote in order to help me "manage" my server a bit better.
+pluto is my personal discord bot I wrote in order to help me "manage" my server a bit better and just wanting to code a discord bot in general.
+And who knows, maybe it will be a public bot in the future.
  
 ### pluto's functionalities
 1. Clearing messages.
 2. Showing avatars of users in the same discord server with him.
 3. Adjusting his prefix to your liking.
-4. Saying hello :)
+4. Playing your favorite music
+5. Saying hello :)
 
 ### Commands that you can't use
 1. Token (showing the bots token).

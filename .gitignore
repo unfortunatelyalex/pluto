@@ -4,6 +4,7 @@ prefixes.json
 *.bak
 *.exe
 *.json
+*.txt
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
