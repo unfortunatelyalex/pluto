@@ -22,5 +22,5 @@ And who knows, maybe it will be a public bot in the future.
 
 # Planned
 - Virustotal API
-- Addon.to API
+- ~~Addon.to API~~
 - Logging things
