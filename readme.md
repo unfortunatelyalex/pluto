@@ -39,5 +39,6 @@ _______________________________________________________________________________
 ### Chat log
 <details>
     <summary>Logging deleted messages</summary>
+
 #### I already have that but the log channel is defined within the code, planned is to set the log channel with a command. :)
 </details>
