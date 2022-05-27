@@ -26,15 +26,15 @@ ______________
 <details>
     <summary>Virustotal API</summary>
 
-#### Explained: You run the command "{prefix}scan" the bot then says that you have to send the file you want to have scanned, you send the file and then after a few minutes, it will give you the link to the scan-result.
+Explained: You run the command "{prefix}scan" the bot then says that you have to send the file you want to have scanned, you send the file and then after a few minutes, it will give you the link to the scan-result.
 </details>
 
 ### Music functionality
 <details>
     <summary>Spotify / Youtube</summary>
 
-#### Right now, the bot downloads the song/video from youtube and puts it in a folder on my pc, it uses the same internet connection I'm using, therefore it can be a bit slow.
-#### I haven't tried Spotify yet, no clue if it's even possible but it's worth a try. Or I can just rewrite my current code which is more likely what I'm going to do.
+Right now, the bot downloads the song/video from youtube and puts it in a folder on my pc, it uses the same internet connection I'm using, therefore it can be a bit slow.
+I haven't tried Spotify yet, no clue if it's even possible but it's worth a try. Or I can just rewrite my current code which is more likely what I'm going to do.
 
 </details>
 
@@ -42,5 +42,5 @@ ______________
 <details>
     <summary>Logging deleted messages</summary>
 
-#### I already have that but the log channel is defined within the code, planned is to set the log channel with a command. :)
+I already have that but the log channel is defined within the code, planned is to set the log channel with a command. :)
 </details>
