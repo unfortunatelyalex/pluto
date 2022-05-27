@@ -18,7 +18,9 @@ And who knows, maybe it will be a public bot in the future.
 
 ### What pluto won't do
 1. Explain the aerodynamics of a cow.
-_______________________________________________________________________________
+
+______________
+
 ## Planned features
 ### Scanning files
 <details>
