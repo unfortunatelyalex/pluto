@@ -1,16 +1,11 @@
-import asyncio
 import os
 import aiohttp
 import random
 import json
 import datetime
-import re
-import requests
-import subprocess
-import urllib.parse
-import urllib.request
 import nextcord
 import yt_dlp
+import tekore
 from nextcord.ext import commands
 from nextcord import FFmpegPCMAudio
 from nextcord.ext import commands
@@ -32,45 +27,14 @@ def get_prefix(client, message):
 bot = commands.Bot(command_prefix=get_prefix, owner_id="399668151475765258", case_insensitive=True)
 
 intents = nextcord.Intents().all()
-yt_dlp.utils.bug_reports_message = lambda: ''
-connected_to_vc = False
 intents.members = True
-clown1 = '🤡'
-clown2 = '<:literalclown:903780300839088188>'
-clown3 = '<a:thumbsclown:931491107546738729>'
-clown4 = '<:deadclown:931491107148300318>'
-clown5 = '<:imdead:953579229293989958>'
-clown6 = '<:6323trollskull:948990530359029821>'
-clown7 = '<:6970realisticskull:948990530287722516>'
-clown8 = '<:6682imdead:948990530241572915>'
-clown9 = '<a:6434skellyfuckya:948990531298545695>'
 embed_footer = 'made with 💛 by alex.#6247'
 embed_footer_icon = "https://cdn.discordapp.com/avatars/791670415779954698/2a9cdb3b39a17dc0682572b806bd3ceb.webp?size=1024"
 missing_perms = "Unable to run this command.\nReason: (MissingPermissions)\nIf you believe this could be a mistake, please contact your administrator."
 not_owner = "You don't own this bot to run this command\nReason: (NotOwner)\nIf you believe this could be a mistake, please contact your administrator."
 perminv = "https://discord.com/api/oauth2/authorize?client_id=791670415779954698&permissions=137707659350&scope=bot"
-ytdl_format_options = {'format': 'bestaudio',
-                       'outtmpl': '%(extractor)s-%(id)s-%(title)s.%(ext)s',
-                       'restrictfilenames': True,
-                       'no-playlist': True,
-                       'nocheckcertificate': True,
-                       'ignoreerrors': False,
-                       'logtostderr': False,
-                       'geo-bypass': True,
-                       'quiet': True,
-                       'no_warnings': True,
-                       'default_search': 'auto',
-                       'source_address': '0.0.0.0'}
-ffmpeg_options = {'options': '-vn'}
-ytdl = yt_dlp.YoutubeDL(ytdl_format_options)
-# play_queue with automatic id continuation
-
-play_queue = []
-player_obj_queue = []
-servers = []  # TODO: add support for multiple servers
-current_server = None
-for file in os.listdir():
-    if file.endswith('.webm'): os.remove(file)
+client_id = "" # Spotify Client ID
+client_secret = "" # Spotify Client Secret
 
 
 
@@ -150,15 +114,6 @@ async def hello(ctx):
 async def prefix(ctx, prefixset=None):
     if (not ctx.author.guild_permissions.administrator):
         await ctx.send(f'{missing_perms}')
-        await ctx.message.add_reaction(clown1)
-        await ctx.message.add_reaction(clown2)
-        await ctx.message.add_reaction(clown3)
-        await ctx.message.add_reaction(clown4)
-        await ctx.message.add_reaction(clown5)
-        await ctx.message.add_reaction(clown6)
-        await ctx.message.add_reaction(clown7)
-        await ctx.message.add_reaction(clown8)
-        await ctx.message.add_reaction(clown9)
         return
     if prefixset is None:
         prefixset = '.'
@@ -185,15 +140,6 @@ async def prefix(ctx, prefixset=None):
 async def token(ctx):
     if ctx.author.id != 399668151475765258:
         await ctx.channel.send(f'{not_owner}')
-        await ctx.message.add_reaction(clown1)
-        await ctx.message.add_reaction(clown2)
-        await ctx.message.add_reaction(clown3)
-        await ctx.message.add_reaction(clown4)
-        await ctx.message.add_reaction(clown5)
-        await ctx.message.add_reaction(clown6)
-        await ctx.message.add_reaction(clown7)
-        await ctx.message.add_reaction(clown8)
-        await ctx.message.add_reaction(clown9)
 
     if ctx.author.id == 399668151475765258:
         await ctx.channel.send('You got jebaited')
@@ -211,37 +157,23 @@ async def token(ctx):
 @has_permissions(manage_messages = True)
 async def mute(ctx, member:nextcord.Member):
     if ctx.author.id != 399668151475765258:
-        await ctx.channel.send(f'{not_owner}')
-        await ctx.message.add_reaction(clown1)
-        await ctx.message.add_reaction(clown2)
-        await ctx.message.add_reaction(clown3)
-        await ctx.message.add_reaction(clown4)
-        await ctx.message.add_reaction(clown5)
-        await ctx.message.add_reaction(clown6)
-        await ctx.message.add_reaction(clown7)
-        await ctx.message.add_reaction(clown8)
-        await ctx.message.add_reaction(clown9)
+        # await ctx.channel.send(f'{not_owner}')
+        await ctx.send("Temporarily disabled")
         return
     role = nextcord.utils.get(ctx.guild.roles, name='Mommy')
-    await member.add_roles(role)
+    # await member.add_roles(role)
+    await ctx.send("Temporarily disabled")
 
 @bot.command(description='Usage: .unmute [@USER]', help="TEMPORARILY DISABLED")
 @has_permissions(manage_messages = True)
 async def unmute(ctx, member:nextcord.Member):
     if ctx.author.id != 399668151475765258:
-        await ctx.channel.send(f'{not_owner}')
-        await ctx.message.add_reaction(clown1)
-        await ctx.message.add_reaction(clown2)
-        await ctx.message.add_reaction(clown3)
-        await ctx.message.add_reaction(clown4)
-        await ctx.message.add_reaction(clown5)
-        await ctx.message.add_reaction(clown6)
-        await ctx.message.add_reaction(clown7)
-        await ctx.message.add_reaction(clown8)
-        await ctx.message.add_reaction(clown9)
+        # await ctx.channel.send(f'{not_owner}')
+        await ctx.send("Temporarily disabled")
         return
     role = nextcord.utils.get(ctx.guild.roles, name='Mommy')
-    await member.remove_roles(role)
+    # await member.remove_roles(role)
+    await ctx.send("Temporarily disabled")
 
 
 
@@ -252,15 +184,6 @@ async def unmute(ctx, member:nextcord.Member):
 async def say(ctx, channel: nextcord.TextChannel, *, message):
     if ctx.author.id != 399668151475765258:
         await ctx.channel.send(f'{not_owner}')
-        await ctx.message.add_reaction(clown1)
-        await ctx.message.add_reaction(clown2)
-        await ctx.message.add_reaction(clown3)
-        await ctx.message.add_reaction(clown4)
-        await ctx.message.add_reaction(clown5)
-        await ctx.message.add_reaction(clown6)
-        await ctx.message.add_reaction(clown7)
-        await ctx.message.add_reaction(clown8)
-        await ctx.message.add_reaction(clown9)
         return
     await channel.send(f"{message}")
 
@@ -274,15 +197,6 @@ async def say(ctx, channel: nextcord.TextChannel, *, message):
 async def embed(ctx, message = None, name = None, value = None):
     if ctx.author.id != 399668151475765258:
         await ctx.send(f'{not_owner}')
-        await ctx.message.add_reaction(clown1)
-        await ctx.message.add_reaction(clown2)
-        await ctx.message.add_reaction(clown3)
-        await ctx.message.add_reaction(clown4)
-        await ctx.message.add_reaction(clown5)
-        await ctx.message.add_reaction(clown6)
-        await ctx.message.add_reaction(clown7)
-        await ctx.message.add_reaction(clown8)
-        await ctx.message.add_reaction(clown9)
         return
     
     if message is None:
@@ -315,15 +229,6 @@ async def embed(ctx, message = None, name = None, value = None):
 async def clear(ctx, amount : int):
     if (not ctx.author.guild_permissions.manage_messages):
         await ctx.send(f'{missing_perms}')
-        await ctx.message.add_reaction(clown1)
-        await ctx.message.add_reaction(clown2)
-        await ctx.message.add_reaction(clown3)
-        await ctx.message.add_reaction(clown4)
-        await ctx.message.add_reaction(clown5)
-        await ctx.message.add_reaction(clown6)
-        await ctx.message.add_reaction(clown7)
-        await ctx.message.add_reaction(clown8)
-        await ctx.message.add_reaction(clown9)
         return
     await ctx.channel.purge(limit=amount + 1)
 
@@ -331,15 +236,6 @@ async def clear(ctx, amount : int):
 async def purge(ctx):
     if ctx.author.id != 399668151475765258:
         await ctx.send(f'{not_owner}')
-        await ctx.message.add_reaction(clown1)
-        await ctx.message.add_reaction(clown2)
-        await ctx.message.add_reaction(clown3)
-        await ctx.message.add_reaction(clown4)
-        await ctx.message.add_reaction(clown5)
-        await ctx.message.add_reaction(clown6)
-        await ctx.message.add_reaction(clown7)
-        await ctx.message.add_reaction(clown8)
-        await ctx.message.add_reaction(clown9)
         return
     await ctx.channel.purge()
 
@@ -379,15 +275,6 @@ async def avatar(ctx, member: nextcord.Member = None):
 async def online(ctx):
     if ctx.author.id != 399668151475765258:
         await ctx.send(f'{not_owner}')
-        await ctx.message.add_reaction(clown1)
-        await ctx.message.add_reaction(clown2)
-        await ctx.message.add_reaction(clown3)
-        await ctx.message.add_reaction(clown4)
-        await ctx.message.add_reaction(clown5)
-        await ctx.message.add_reaction(clown6)
-        await ctx.message.add_reaction(clown7)
-        await ctx.message.add_reaction(clown8)
-        await ctx.message.add_reaction(clown9)
         return
     await bot.change_presence(status=nextcord.Status.online,activity=nextcord.Activity(type=2, name="your bullshit"))
     await ctx.message.add_reaction('🟢')
@@ -397,15 +284,6 @@ async def online(ctx):
 async def idle(ctx):
     if ctx.author.id != 399668151475765258:
         await ctx.send(f'{not_owner}')
-        await ctx.message.add_reaction(clown1)
-        await ctx.message.add_reaction(clown2)
-        await ctx.message.add_reaction(clown3)
-        await ctx.message.add_reaction(clown4)
-        await ctx.message.add_reaction(clown5)
-        await ctx.message.add_reaction(clown6)
-        await ctx.message.add_reaction(clown7)
-        await ctx.message.add_reaction(clown8)
-        await ctx.message.add_reaction(clown9)
         return
     await bot.change_presence(status=nextcord.Status.idle, activity=nextcord.Activity(type=2, name="your bullshit"))
     await ctx.message.add_reaction('🟡')
@@ -415,15 +293,6 @@ async def idle(ctx):
 async def dnd(ctx):
     if ctx.author.id != 399668151475765258:
         await ctx.send(f'{not_owner}')
-        await ctx.message.add_reaction(clown1)
-        await ctx.message.add_reaction(clown2)
-        await ctx.message.add_reaction(clown3)
-        await ctx.message.add_reaction(clown4)
-        await ctx.message.add_reaction(clown5)
-        await ctx.message.add_reaction(clown6)
-        await ctx.message.add_reaction(clown7)
-        await ctx.message.add_reaction(clown8)
-        await ctx.message.add_reaction(clown9)
         return
     await bot.change_presence(status=nextcord.Status.dnd, activity=nextcord.Activity(type=2, name="your bullshit"))
     await ctx.message.add_reaction('🔴')
@@ -433,15 +302,6 @@ async def dnd(ctx):
 async def invisible(ctx):
     if ctx.author.id != 399668151475765258:
         await ctx.send(f'{not_owner}')
-        await ctx.message.add_reaction(clown1)
-        await ctx.message.add_reaction(clown2)
-        await ctx.message.add_reaction(clown3)
-        await ctx.message.add_reaction(clown4)
-        await ctx.message.add_reaction(clown5)
-        await ctx.message.add_reaction(clown6)
-        await ctx.message.add_reaction(clown7)
-        await ctx.message.add_reaction(clown8)
-        await ctx.message.add_reaction(clown9)
         return
     await bot.change_presence(status=nextcord.Status.invisible, activity=nextcord.Activity(type=2, name="your bullshit"))
     await ctx.message.add_reaction('⚪')
@@ -455,15 +315,6 @@ async def invisible(ctx):
 async def playing(ctx, *, message):
     if ctx.author.id != 399668151475765258:
         await ctx.send(f'{not_owner}')
-        await ctx.message.add_reaction(clown1)
-        await ctx.message.add_reaction(clown2)
-        await ctx.message.add_reaction(clown3)
-        await ctx.message.add_reaction(clown4)
-        await ctx.message.add_reaction(clown5)
-        await ctx.message.add_reaction(clown6)
-        await ctx.message.add_reaction(clown7)
-        await ctx.message.add_reaction(clown8)
-        await ctx.message.add_reaction(clown9)
         return
     await bot.change_presence(activity=nextcord.Activity(type=0, name=message))
     await ctx.message.add_reaction('👌')
@@ -478,15 +329,6 @@ async def playing_error(ctx, error):
 async def listening(ctx, *, message):
     if ctx.author.id != 399668151475765258:
         await ctx.send(f'{not_owner}')
-        await ctx.message.add_reaction(clown1)
-        await ctx.message.add_reaction(clown2)
-        await ctx.message.add_reaction(clown3)
-        await ctx.message.add_reaction(clown4)
-        await ctx.message.add_reaction(clown5)
-        await ctx.message.add_reaction(clown6)
-        await ctx.message.add_reaction(clown7)
-        await ctx.message.add_reaction(clown8)
-        await ctx.message.add_reaction(clown9)
         return
     await bot.change_presence(activity=nextcord.Activity(type=2, name=message))
     await ctx.message.add_reaction('👌')
@@ -501,15 +343,6 @@ async def listening_error(ctx, error):
 async def watching(ctx, *, message):
     if ctx.author.id != 399668151475765258:
         await ctx.send(f'{not_owner}')
-        await ctx.message.add_reaction(clown1)
-        await ctx.message.add_reaction(clown2)
-        await ctx.message.add_reaction(clown3)
-        await ctx.message.add_reaction(clown4)
-        await ctx.message.add_reaction(clown5)
-        await ctx.message.add_reaction(clown6)
-        await ctx.message.add_reaction(clown7)
-        await ctx.message.add_reaction(clown8)
-        await ctx.message.add_reaction(clown9)
         return
     await bot.change_presence(activity=nextcord.Activity(type=3, name=message))
     await ctx.message.add_reaction('👌')
@@ -524,15 +357,6 @@ async def watching_error(ctx, error):
 async def compete(ctx, *, message):
     if ctx.author.id != 399668151475765258:
         await ctx.send(f'{not_owner}')
-        await ctx.message.add_reaction(clown1)
-        await ctx.message.add_reaction(clown2)
-        await ctx.message.add_reaction(clown3)
-        await ctx.message.add_reaction(clown4)
-        await ctx.message.add_reaction(clown5)
-        await ctx.message.add_reaction(clown6)
-        await ctx.message.add_reaction(clown7)
-        await ctx.message.add_reaction(clown8)
-        await ctx.message.add_reaction(clown9)
         return
     await bot.change_presence(activity=nextcord.Activity(type=5, name=message))
     await ctx.message.add_reaction('👌')
@@ -622,31 +446,6 @@ async def meme(ctx):
                 await ctx.send(data[0]['data']['children'][0]['data']['url'])
     except Exception as e:
         await ctx.send(f'{e}')
-        
-
-
-# create a help command that returns every command and its description
-# @bot.command(description="Usage: .help", help="Returns every command and its description")
-# async def help(ctx):
-#     embed = nextcord.Embed(title='Help', description='Here are all of the commands for the bot', color=0x00ff00)
-#     # add a field for the prefix command and its description
-#     embed.add_field(name='Prefix', value='Changes the bots prefix', inline=False)
-#     # add a field for the avatar command and its description
-#     embed.add_field(name='Avatar', value='Let\'s you look at other\'s avatar\'s', inline=False)
-#     # add a field for the clear command with its description
-#     embed.add_field(name='Clear', value='Clears a certain amount of messages', inline=False)
-#     embed.add_field(name='Ping', value='Returns the bots latency', inline=False)
-#     embed.add_field(name='Invite', value='Sends the bots invite link', inline=False)
-#     embed.add_field(name='Dog', value='Posts a random dog picture from the dog api', inline=False)
-#     embed.add_field(name='Cat', value='Posts a random cat picture from the cat api', inline=False)
-#     embed.add_field(name='Meme', value='Posts a random meme from the dankmemes and memes subreddit', inline=False)
-#     embed.add_field(name='Help', value='Returns every command and its description', inline=False)
-#     embed.add_field(name='Listening', value='Changes the bots activity status to "listening to ..."', inline=False)
-#     embed.add_field(name='Watching', value='Changes the bots activity status to "watching ..."', inline=False)
-#     embed.add_field(name='Competing in', value='Changes the bots activity status to "competing in ..."', inline=False)
-#     embed.set_footer(text=f'{embed_footer}', icon_url=f'{embed_footer_icon}')
-#     await ctx.send(embed=embed)
-#     await ctx.message.add_reaction('👌')
 
 
 # create a command that returns the creation date of a user, the roles, the avatar, and the discriminator
@@ -715,194 +514,6 @@ async def music(ctx, *, query):
 
 
 
-# MUSIC SHIT START
-
-class YTDLSource(nextcord.PCMVolumeTransformer):
-    def __init__(self, source, *, data, volume=0.5):
-        super().__init__(source, volume)
-        self.data = data
-        self.title = data.get('title')
-        self.url = data.get('url')
-
-    @classmethod
-    async def from_url(cls, url, *, loop=None, stream=True):
-        loop = loop or asyncio.get_event_loop()
-        data = await loop.run_in_executor(None, lambda: ytdl.extract_info(url, download=not stream))
-        if 'entries' in data: data = data['entries'][0]
-        filename = data['url'] if stream else ytdl.prepare_filename(data)
-        return cls(nextcord.FFmpegPCMAudio(filename, **ffmpeg_options), data=data)
-
-
-async def connect_to_voice_channel(ctx, channel):
-    global voice_client, connected_to_vc
-    voice_client = await channel.connect()
-    if voice_client.is_connected():
-        connected_to_vc = True
-        await ctx.send(f'Connected to {voice_client.channel.name}')
-    else:
-        connected_to_vc = False
-        await ctx.send(f'Failed to connect to voice channel {ctx.author.voice.channel.name}')
-
-
-@bot.command()
-async def disconnect(ctx):
-    """Disconnect from voice channel"""
-    global connected_to_vc, play_queue, player_obj_queue, current_server
-    if connected_to_vc:
-        await voice_client.disconnect()
-        await ctx.send(f'Disconnected from {voice_client.channel.name}')
-        connected_to_vc = False
-        play_queue = []
-        player_obj_queue = []
-        current_server = None
-
-
-@bot.command()
-async def pause(ctx):
-    """Pause the current song"""
-    if connected_to_vc and voice_client.is_playing():
-        voice_client.pause()
-        await ctx.send('Paused')
-
-
-@bot.command()
-async def resume(ctx):
-    """Resume the current song"""
-    if connected_to_vc and voice_client.is_paused():
-        voice_client.resume()
-        await ctx.send('Resumed')
-
-
-@bot.command()
-async def skip(ctx):
-    """Skip the current song"""
-    if connected_to_vc and voice_client.is_playing():
-        voice_client.stop()
-        await play_next(ctx)
-
-
-@bot.command()
-async def queue(ctx):
-    """Show the current queue"""
-    if connected_to_vc:
-        await ctx.send(f'{play_queue}')
-
-
-@bot.command()
-async def remove(ctx, id: int):
-    """Remove an item from queue by index (1...)"""
-    if connected_to_vc:
-        if id == 0:
-            await ctx.send('Cannot remove current playing song')
-        else:
-            await ctx.send(f'Removed {play_queue[id]}')
-            play_queue.pop(id)
-            player_obj_queue.pop(id)
-
-
-@bot.command()
-async def clq(ctx):
-    """Clear the queue and stop current song"""
-    global play_queue, player_obj_queue
-    if connected_to_vc and voice_client.is_playing():
-        voice_client.stop()
-        play_queue = []
-        player_obj_queue = []
-        await ctx.send('Queue cleared.')
-
-
-@bot.command()
-async def song(ctx):
-    """Show the current song"""
-    if connected_to_vc:
-        await ctx.send(f'Currently playing {play_queue[0]}')
-
-
-async def play_next(ctx):
-    print('\nPlaying next...')
-    if play_queue:
-        await play_song(ctx, player_obj_queue[0])
-    else:
-        await ctx.send('Reached end of queue')
-
-
-def callback(e):
-    if e:
-        print(f'Error: {e}')
-    else:
-        # finished playing prev song without error so removing entry from queue here
-        print('\nPlaying next...')
-        if play_queue: play_queue.pop(0)
-        if player_obj_queue:
-            player_obj_queue.pop(0)
-            voice_client.play(player_obj_queue[0], after=callback)
-        else:
-            print('Reached end of queue')
-
-
-async def play_song(ctx, link):
-    async with ctx.typing():
-        try:
-            player = await YTDLSource.from_url(link, loop=bot.loop, stream=False)
-        except:
-            print('Error encountered. Attempting to clear cache and retry...')
-            subprocess.call('yt-dlp --rm-cache-dir', shell=True)
-            player = await YTDLSource.from_url(link, loop=bot.loop, stream=False)
-        player_obj_queue.append(player)
-        if not voice_client.is_playing():
-            voice_client.play(player_obj_queue[0], after=callback)
-            await ctx.send(f'Now playing: {player_obj_queue[0].title}')
-
-
-@bot.command()
-async def play(ctx, *, song: str):
-    """Play a YouTube video by URL if given a URL, or search up the song and play the first video in search result"""
-    global connected_to_vc, current_server
-    if current_server and current_server != ctx.guild:
-        await ctx.send('The bot is currently being used in another server.')
-        return
-    elif current_server is None:
-        current_server = ctx.guild
-    if not connected_to_vc:
-        if ctx.author.voice is None:
-            connected_to_vc = False
-            await ctx.send(f'You are not connected to any voice channel!')
-        else:
-            await connect_to_voice_channel(ctx, ctx.author.voice.channel)
-    elif voice_client.channel != ctx.author.voice.channel:
-        await voice_client.move_to(ctx.author.voice.channel)
-    if connected_to_vc:
-        try:
-            requests.get(song)
-        except (requests.ConnectionError, requests.exceptions.MissingSchema):
-            URL = False
-        else:
-            URL = True
-        if URL:
-            link = song
-        else:
-            # Search up the query and play the first video in search result
-            query_string = urllib.parse.urlencode({"search_query": song})
-            formatUrl = urllib.request.urlopen("https://www.youtube.com/results?" + query_string)
-            search_results = re.findall(r"watch\?v=(\S{11})", formatUrl.read().decode())
-            link = f'https://www.youtube.com/watch?v={search_results[0]}'
-        play_queue.append(link)
-        if voice_client.is_playing():
-            await ctx.send(f'Added to queue: {song}')
-        await play_song(ctx, link)
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -937,15 +548,6 @@ async def restart(ctx):
     )
     if ctx.author.id != 399668151475765258:
         await ctx.send(f'{not_owner}')
-        await ctx.message.add_reaction(clown1)
-        await ctx.message.add_reaction(clown2)
-        await ctx.message.add_reaction(clown3)
-        await ctx.message.add_reaction(clown4)
-        await ctx.message.add_reaction(clown5)
-        await ctx.message.add_reaction(clown6)
-        await ctx.message.add_reaction(clown7)
-        await ctx.message.add_reaction(clown8)
-        await ctx.message.add_reaction(clown9)
         return
         
     await logs.send(embed=restartembed)             #UM IN LOG CHANNEL ZU POSTEN
