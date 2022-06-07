@@ -4,10 +4,6 @@ import random
 import json
 import datetime
 import nextcord
-import yt_dlp
-import tekore
-from nextcord.ext import commands
-from nextcord import FFmpegPCMAudio
 from nextcord.ext import commands
 from nextcord.ext.commands import MissingRequiredArgument
 from nextcord.ext.commands.core import has_permissions
@@ -33,8 +29,6 @@ embed_footer_icon = "https://cdn.discordapp.com/avatars/791670415779954698/2a9cd
 missing_perms = "Unable to run this command.\nReason: (MissingPermissions)\nIf you believe this could be a mistake, please contact your administrator."
 not_owner = "You don't own this bot to run this command\nReason: (NotOwner)\nIf you believe this could be a mistake, please contact your administrator."
 perminv = "https://discord.com/api/oauth2/authorize?client_id=791670415779954698&permissions=137707659350&scope=bot"
-client_id = "" # Spotify Client ID
-client_secret = "" # Spotify Client Secret
 
 
 
@@ -478,29 +472,6 @@ async def roastme(ctx):
         category = random.choice(list(data.keys()))
         roast = random.choice(data[category])
         await ctx.send(f'{roast}')
-    except Exception as e:
-        await ctx.send(f'{e}')
-
-
-# create a music command with the prefix .play using the youtube api
-@bot.command(description="Usage: .music", help="Plays a song from youtube")
-async def music(ctx, *, query):
-    try:
-        async with aiohttp.ClientSession() as session:
-            async with session.get(f'https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=1&q={query}&key={(os.getenv("key"))}') as r:
-                data = await r.json()
-                embed = nextcord.Embed(title=f'Now Playing: {data["items"][0]["snippet"]["title"]}', color=0x00ff00)
-                embed.set_thumbnail(url=f'{data["items"][0]["snippet"]["thumbnails"]["default"]["url"]}')
-                embed.set_footer(text=f'Requested by {ctx.author}', icon_url=ctx.author.display_avatar)
-                await ctx.send(embed=embed)
-                await ctx.send(f'https://www.youtube.com/watch?v={data["items"][0]["id"]["videoId"]}')
-                # bot joins voice channel of author
-                channel = ctx.message.author.voice.channel
-                voice = await channel.connect()
-                # bot plays the song from youtube
-                source = FFmpegPCMAudio(f'https://www.youtube.com/watch?v={data["items"][0]["id"]["videoId"]}')
-                # bot plays the song
-                voice.play(source)
     except Exception as e:
         await ctx.send(f'{e}')
 
