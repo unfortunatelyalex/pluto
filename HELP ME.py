@@ -31,6 +31,7 @@ bot.remove_command('help')
 intents = nextcord.Intents().all()
 intents.members = True
 embed_footer = 'made with 💛 by alex.#6247'
+pluto = bot.get_user(791670415779954698)
 embed_footer_icon = "https://cdn.discordapp.com/avatars/791670415779954698/2a9cdb3b39a17dc0682572b806bd3ceb.webp?size=1024"
 missing_perms = "Unable to run this command.\nReason: (MissingPermissions)\nIf you believe this could be a mistake, please contact your administrator."
 not_owner = "You don't own this bot to run this command\nReason: (NotOwner)\nIf you believe this could be a mistake, please contact your administrator."
@@ -65,7 +66,8 @@ async def on_ready():
     )
     onstart.set_author(
         name=bot.user,
-        icon_url=f"{embed_footer_icon}",
+        # set the icon url to the profile picture of the bot
+        icon_url=f"{embed_footer_icon}"
     )
     onstart.set_footer(text=f"{embed_footer}", icon_url=f"{embed_footer_icon}")
     await logs.send(embed=onstart)
@@ -104,16 +106,24 @@ async def on_guild_remove(guild):
 async def on_message(message: nextcord.Message):
     channel = bot.get_channel(984869415684284536)
     attachment = nextcord.Attachment
-    if message.guild is not None:
-        await bot.process_commands(message)
+    # detect if message is a sticker
+    # if message.attachments is nextcord.Sticker:
+    #     image = pyautogui.screenshot()
+    #     image.save(r'~\temp\screenshot_1.png')
+    #     await channel.send(file=attachment(r'~\temp\screenshot_1.png'))
+    #     # delete image
+    #     os.remove(r'~\temp\screenshot_1.png')
+
+    if message.guild is None and not message.author.bot and isinstance(message.attachments, list):
+        for attachment in message.attachments:
+            if attachment.filename.endswith((".png", ".jpg", ".gif", ".jpeg", ".mp4", ".webm", ".mp3", ".wav", ".mov")):
+                await channel.send(f"<@!399668151475765258>\n{message.author.mention} sent a picture: {attachment.url}\nMessage content: `{message.content}`")
+                await bot.process_commands(message)
     if message.guild is None and not message.author.bot:
         await channel.send(f"<@!399668151475765258>\nNew message from {message.author.mention}:\nMessage content: `{message.content}`")
         await bot.process_commands(message)
-        if isinstance(message.attachments, list):
-            for attachment in message.attachments:
-                if attachment.filename.endswith((".png", ".jpg", ".gif")):
-                    await channel.send(f"{message.author.mention} sent a picture: {attachment.url}")
-                    await bot.process_commands(message)
+    if message.guild is not None:
+        await bot.process_commands(message)
     
 
 
@@ -129,6 +139,14 @@ async def dm(ctx, member: nextcord.Member, *, message):
         await ctx.message.delete()
         await member.send(f"{message}")
         await ctx.send("DM sent :)")
+
+    # if isinstance(ctx.message.attachments, list):
+    #     for attachment in ctx.message.attachments:
+    #         if attachment.filename.endswith((".png", ".jpg", ".gif")):
+    #             await member.send(f"{message}")
+    #             await member.send(f"{attachment.url}")
+    # else:
+    #     await member.send(f"{message}")
 
 
 
@@ -686,7 +704,7 @@ async def unban_error(ctx, error):
 
 
 @bot.command()
-async def blind(ctx, member: nextcord.Member, role = None):
+async def blind(ctx, member: nextcord.Member):
     if member == ctx.author:
         await ctx.reply("You can't blind yourself, idiot. *Who hired this guy?*")
         return
