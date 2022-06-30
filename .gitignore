@@ -5,6 +5,9 @@ prefixes.json
 *.exe
 *.json
 *.txt
+*.db
+*.alex
+*.xlsx
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
