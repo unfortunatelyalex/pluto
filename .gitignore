@@ -8,6 +8,8 @@ prefixes.json
 *.db
 *.alex
 *.xlsx
+utils.py
+/pluto slash/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
