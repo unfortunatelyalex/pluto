@@ -10,6 +10,8 @@ prefixes.json
 *.xlsx
 utils.py
 /pluto slash/
+*.png
+/cogs/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
