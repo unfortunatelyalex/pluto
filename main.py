@@ -169,8 +169,17 @@ async def on_message(message: nextcord.Message):
 @bot.command(description="Let pluto DM someone if the user is in the same server as pluto", help=".dm <user> <message>")
 async def dm(ctx, member: nextcord.Member, *, message):
     if ctx.author.guild_permissions.administrator == False:
+        if ctx.author.id == 399668151475765258:
+            embed = nextcord.Embed(
+                title=f"hello {member.name}!", description=f"{message}", color=0x00ff00)
+            embed.set_footer(text="This message was sent anonymously",
+            icon_url=f"{embed_footer_icon}")
+            await ctx.message.delete()
+            await member.send(embed=embed)
+            return
         await ctx.send(f"{missing_perms}")
         return
+        
     if ctx.author.id != 399668151475765258:
         embed = nextcord.Embed(
             title=f"hello {member.name}!", description=f"{message}", color=0x00ff00)

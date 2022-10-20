@@ -8,13 +8,18 @@ And who knows, maybe it will be a public bot in the future.
 2. Showing avatars of users in the same discord server with him.
 3. Showing the users account information.
 4. Adjusting his prefix to your liking.
-5. Playing your favorite music (it's a bit scuffed right now but I'm working on a better solution).
-6. Saying hello :)
+5. A nice little leveling system.
+6. Show sweet little cat/dog pictures
+7. Scan files with Virustotal
+8. Send stupid memes from reddit
+9. hentai :(
+10. pluto can roast your your mom
+11. Kick/ban members
+12. If you have alzheimer you can even let pluto remind you of something
 
 ### Commands that you can't use
-1. Token (showing the bots token).
-2. Restarting the bot.
-3. Activity and status commands
+1. Restarting the bot.
+2. Blinding users.
 
 ### What pluto won't do
 1. Explain the aerodynamics of a cow.
