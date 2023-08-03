@@ -3,6 +3,7 @@ import pytz
 import json
 import psutil
 import random
+import openai
 import asyncio
 import aiohttp
 import requests
@@ -11,11 +12,11 @@ import nextcord
 from utils import *
 from nextcord.utils import get
 from dotenv import load_dotenv
-from nextcord.ext import commands, application_checks
 from nextcord.ui import Button, View
 from nextcord.abc import GuildChannel
+from nextcord.ext import commands, application_checks
 from nextcord.ext.commands import MissingRequiredArgument
-from nextcord import Intents, Interaction, SlashOption, ChannelType, ButtonStyle
+from nextcord import Intents, Interaction, SlashOption, ChannelType, ButtonStyle, File
 
 
 load_dotenv()
@@ -29,11 +30,12 @@ def get_prefix(client, message):
 
     return prefixes[str(message.guild.id)]
 
-
+openai.api_key = os.getenv("OPENAI_API_KEY")
+openai.api_base = os.getenv("OPENAI_API_BASE")
 helpGuide = json.load(open("help.json"))
 intents = nextcord.Intents.default()
 intents.message_content = True
-embed_footer = 'made with 💛 by alex.#0017'
+embed_footer = 'made with 💛 by alexdot'
 embed_footer_icon = "https://cdn.discordapp.com/avatars/791670415779954698/2a9cdb3b39a17dc0682572b806bd3ceb.webp?size=1024"
 missing_perms = "Unable to run this command.\nReason: (MissingPermissions)\nIf you believe this could be a mistake, please contact your administrator."
 not_owner = "You don't own this bot to run this command\nReason: (NotOwner)\nIf you believe this could be a mistake, please contact your administrator."
@@ -318,7 +320,8 @@ async def avatar(ctx, member: nextcord.Member = None):
         title=f"{member.name}'s Avatar", timestamp=datetime.datetime.now(datetime.timezone.utc))
     avatarEmbed.set_image(url=memberAvatar)
     avatarEmbed.set_footer(
-        text=f"{embed_footer}", icon_url=f"{embed_footer_icon}")
+        text=f"{embed_footer}", icon_url=f"{embed_footer_icon}"
+    )
 
     await ctx.send(embed=avatarEmbed)
 
@@ -579,7 +582,7 @@ async def about(ctx):
     )
     embed.add_field(
         name="About Me",
-        value=f"> Guild count: `{len(bot.guilds)}` \n> Line count: `{len(open('main.py').readlines())}` \n> Made by: `@alex.#0017`",
+        value=f"> Guild count: `{len(bot.guilds)}` \n> Line count: `{len(open('main.py').readlines())}` \n> Made by: `alexdot`",
         inline=False
     )
     if ctx.author.avatar is not None:
@@ -620,7 +623,7 @@ async def about(interaction: Interaction):
     )
     embed.add_field(
         name="About Me",
-        value=f"> Guild count: `{len(bot.guilds)}` \n> Line count: `{len(open('main.py').readlines())}` \n> Made by: `@alex.#0017`",
+        value=f"> Guild count: `{len(bot.guilds)}` \n> Line count: `{len(open('main.py').readlines())}` \n> Made by: `alexdot`",
         inline=False
     )
     if interaction.user.avatar is not None:
@@ -634,6 +637,80 @@ async def about(interaction: Interaction):
             icon_url=f"{interaction.user.default_avatar.url}"
         )
     await interaction.send(embed=embed)
+
+
+
+
+
+
+
+# AI START
+
+@bot.slash_command(description="Generate images based on a prompt")
+async def imagine(interaction: Interaction, prompt: str = SlashOption(description='Prompt for image generation'), amount: int = SlashOption(description='Number of images (1-5)', choices=[1, 2, 3, 4, 5], default=1)):
+    await interaction.response.defer(ephemeral=False)
+    
+    try:
+        response = openai.Image.create(
+            prompt=prompt,
+            n=amount
+        )
+        
+        images = response["data"]
+        
+        if len(images) > 0:
+            temp_dir = "/www/wwwroot/secbot/tempfile"  # Replace with the actual path to your temporary directory
+            user_id = str(interaction.user.id)
+            
+            user_temp_dir = os.path.join(temp_dir, user_id)
+            os.makedirs(user_temp_dir, exist_ok=True)
+            
+            for i, image in enumerate(images):
+                url = image["url"]
+                image_data = await download_image(url)
+                
+                if image_data:
+                    image_path = os.path.join(user_temp_dir, f"generated_image_{i+1}.png")
+                    with open(image_path, "wb") as f:
+                        f.write(image_data)
+                
+            file_paths = [os.path.join(user_temp_dir, f"generated_image_{i+1}.png") for i in range(len(images))]
+            
+            files = [File(fp) for fp in file_paths]  # Convert file paths to nextcord.File objects
+            
+            await interaction.followup.send("Here are your generated images:", files=files)
+            
+            # Delete the temporary image files
+            for file_path in file_paths:
+                os.remove(file_path)
+            
+            # Remove the user's temporary directory if empty
+            if not os.listdir(user_temp_dir):
+                os.rmdir(user_temp_dir)
+            
+        else:
+            await interaction.followup.send("No images were generated.")
+    
+    except nextcord.HTTPException as e:
+        print(f"An error occurred while sending the response: {e}")
+
+async def download_image(url: str) -> bytes:
+    async with aiohttp.ClientSession() as session:
+        async with session.get(url) as response:
+            if response.status == 200:
+                return await response.read()
+            else:
+                return None
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1059,54 +1136,6 @@ async def scan(ctx, *args):
     await ctx.reply(embed=resultmsg)
 
 
-@bot.event
-async def on_voice_state_update(member, before, after):
-    if after.channel is not None:
-        if after.channel.name == "voice chat erstellen":
-            # create a new file called "tempchannel.json"
-            # format it to a dictionary
-            # per dictonary, create a new channel
-            with open("tempchannel.json", "r") as f:
-                data = json.load(f)
-            channel = await create_voice_channel(after.channel.guild, f"{member.name}".lower(), category_name="idek")
-            move_lobby = await create_voice_channel(after.channel.guild, f"⬆ {member.name} Lobby".lower(), category_name="idek")
-            # write the channel and movelobby to the file
-            data[f"{member.name}".lower()] = channel.id
-            data[f"{member.name}".lower() + "lobby"] = move_lobby.id
-            with open("tempchannel.json", "w") as f:
-                json.dump(data, f, indent=4)
-
-            await channel.set_permissions(member, connect=True, speak=True, move_members=True)
-            await move_lobby.set_permissions(member, connect=True, speak=True, move_members=True)
-            await channel.set_permissions(after.channel.guild.default_role, view_channel=False, connect=False)
-            await channel.set_permissions(after.channel.guild.get_role(985205310740389918), view_channel=True, connect=False)
-            await move_lobby.set_permissions(after.channel.guild.default_role, view_channel=False, connect=False)
-            await move_lobby.set_permissions(after.channel.guild.get_role(985205310740389918), view_channel=True, connect=True)
-
-            if channel is not None:
-                await member.move_to(channel)
-
-    if before.channel is not None:
-        if before.channel.category.id == get_category_by_name(before.channel.guild, "idek").id:
-            # set move_lobby as a variable to avoid errors
-            move_lobby = get_channel_by_name(
-                before.channel.guild, f"⬆ {member.name} Lobby".lower())
-
-            # check if a voice channel in tempchannel.json is empty, if so, delete it
-            with open("tempchannel.json", "r") as f:
-                data = json.load(f)
-            if data[f"{member.name}".lower()] is not None:
-                channel = get(before.channel.guild.channels,
-                              id=data[f"{member.name}".lower()])
-                if channel is not None:
-                    if len(channel.members) == 0:
-                        await channel.delete()
-                        await move_lobby.delete()
-                        # delete both channels from the file
-                        data[f"{member.name}".lower()] = None
-                        data[f"{member.name}".lower() + "lobby"] = None
-                        with open("tempchannel.json", "w") as f:
-                            json.dump(data, f, indent=4)
 
 
 def createHelpEmbed(pageNum=0, inline=True):
@@ -1173,6 +1202,8 @@ async def help(interaction: Interaction):
     sent_msg = await interaction.send(embed=createHelpEmbed(currentPage), view=myview)
 
 
+
+
 @bot.slash_command(description="Restarts the bot.")
 async def restart(interaction: Interaction):
     restartembed = nextcord.Embed(
@@ -1197,101 +1228,6 @@ async def restart(interaction: Interaction):
     await bot.close()
 
 
-# Elias ersatz
-
-@bot.command(description="Self roles")
-async def rr(ctx):
-
-    # if author doesn't have admin permissions, return
-    if not ctx.author.guild_permissions.administrator:
-        await ctx.send("You don't have permissions to send this command", delete_after=3)
-        return
-
-    young = Button(label="13-15", style=ButtonStyle.blurple)
-    young_role = nextcord.utils.get(ctx.guild.roles, name="13-15")
-
-    middle = Button(label="15-17", style=ButtonStyle.blurple)
-    middle_role = nextcord.utils.get(ctx.guild.roles, name="15-17")
-
-    old = Button(label="18+", style=ButtonStyle.blurple)
-    old_role = nextcord.utils.get(ctx.guild.roles, name="18+😳")
-
-    man = Button(label="Männlich", style=ButtonStyle.blurple)
-    man_role = nextcord.utils.get(ctx.guild.roles, name="Männlich")
-
-    girl = Button(label="Weiblich", style=ButtonStyle.blurple)
-    girl_role = nextcord.utils.get(ctx.guild.roles, name="Weiblich")
-
-    divers = Button(label="Divers", style=ButtonStyle.red)
-    divers_role = nextcord.utils.get(ctx.guild.roles, name="Divers")
-
-    async def young_callback(interaction):
-        if young_role in interaction.user.roles:
-            await interaction.user.remove_roles(young_role)
-            await interaction.send("Dir wurde die Rolle `13-15` weggenommen", ephemeral=True)
-        else:
-            await interaction.user.add_roles(young_role)
-            await interaction.send("Dir wurde die Rolle `13-15` gegeben", ephemeral=True)
-    young.callback = young_callback
-
-    async def middle_callback(interaction):
-        if middle_role in interaction.user.roles:
-            await interaction.user.remove_roles(middle_role)
-            await interaction.send("Dir wurde die Rolle `15-17` weggenommen", ephemeral=True)
-        else:
-            await interaction.user.add_roles(middle_role)
-            await interaction.send("Dir wurde die Rolle `15-17` gegeben", ephemeral=True)
-    middle.callback = middle_callback
-
-    async def old_callback(interaction):
-        if old_role in interaction.user.roles:
-            await interaction.user.remove_roles(old_role)
-            await interaction.send("Dir wurde die Rolle `18+` weggenommen", ephemeral=True)
-        else:
-            await interaction.user.add_roles(old_role)
-            await interaction.send("Dir wurde die Rolle `18+` gegeben", ephemeral=True)
-    old.callback = old_callback
-
-    async def man_callback(interaction):
-        if man_role in interaction.user.roles:
-            await interaction.user.remove_roles(man_role)
-            await interaction.send("Dir wurde die Rolle `Männlich` weggenommen", ephemeral=True)
-        else:
-            await interaction.user.add_roles(man_role)
-            await interaction.send("Dir wurde die Rolle `Männlich` gegeben", ephemeral=True)
-    man.callback = man_callback
-
-    async def girl_callback(interaction):
-        if girl_role in interaction.user.roles:
-            await interaction.user.remove_roles(girl_role)
-            await interaction.send("Dir wurde die Rolle `Weiblich` weggenommen", ephemeral=True)
-        else:
-            await interaction.user.add_roles(girl_role)
-            await interaction.send("Dir wurde die Rolle `Weiblich` gegeben", ephemeral=True)
-    girl.callback = girl_callback
-
-    async def divers_callback(interaction):
-        if divers_role in interaction.user.roles:
-            await interaction.user.remove_roles(divers_role)
-            await interaction.send("Dir wurde die Rolle `Divers` weggenommen", ephemeral=True)
-        else:
-            await interaction.user.add_roles(divers_role)
-            await interaction.send("Dir wurde die Rolle `Divers` gegeben", ephemeral=True)
-    divers.callback = divers_callback
-
-    buttonsxd = View(timeout=99999999999)
-    buttonsxd.add_item(young)
-    buttonsxd.add_item(middle)
-    buttonsxd.add_item(old)
-    buttonsxd.add_item(man)
-    buttonsxd.add_item(girl)
-    buttonsxd.add_item(divers)
-
-    embed = nextcord.Embed(title="Reaction Roles",
-                           description="Click on the buttons to get your roles")
-    embed.set_footer(text=f"{embed_footer}", icon_url=f"{embed_footer_icon}")
-    await ctx.message.delete()
-    await ctx.send(embed=embed, view=buttonsxd)
 
 
 if __name__ == "__main__":

@@ -7,8 +7,10 @@ prefixes.json
 *.txt
 *.db
 *.alex
+*.save
 *.xlsx
 utils.py
+/tempimages
 /pluto slash/
 *.png
 /cogs/
