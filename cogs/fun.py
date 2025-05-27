@@ -71,6 +71,7 @@ class FunCommands(commands.Cog):
     async def joke_error(self, i: Interaction, error):
         if isinstance(error, commands.CommandInvokeError):
             await i.response.send_message("The joke API is down. Please try again later.", ephemeral=True)
+            
         error_message = str(error.original) if hasattr(error, 'original') else str(error)
         tb = traceback.format_exception(type(error), error, error.__traceback__)
         traceback_str = "".join(tb).strip()

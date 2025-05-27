@@ -26,8 +26,6 @@ class ModerationCommands(commands.Cog):
             )
             return
 
-        # Permission already validated by decorator
-        …
         await member.kick(reason=reason)
         await i.response.send_message(f"{member.mention} has been kicked.")
 

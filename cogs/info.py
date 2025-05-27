@@ -14,12 +14,58 @@ class Info(commands.Cog):
     
 
     @nextcord.slash_command(description="Information about a user")
+    async def userinfo(self, i: Interaction, user: nextcord.Member = SlashOption(description='User to get info about', required=False)):
+        if user is None:
+            user = i.user
+        fetch_user = await self.bot.fetch_user(user.id)
+        embed = nextcord.Embed(title=f'Userinfo for {user.name}', color=0x202225)
+        if user.avatar is not None:
+            embed.set_thumbnail(
+                url=f"{user.avatar.url}"
+            )
+        else:
+            embed.set_thumbnail(
+                url=f"{user.default_avatar.url}"
+            )
+        if i.user.avatar is not None:
+            embed.set_author(
+                name=f"{i.user.name}",
+                icon_url=f"{i.user.avatar.url}"
+            )
+        else:
+            embed.set_author(
+                name=f"{i.user.name}",
+                icon_url=f"{i.user.default_avatar.url}"
+            )
+        embed.add_field(
+            name="General Info",
+            value=f"> Joined Discord on `{user.created_at.strftime('%d %b %Y %H:%M:%S')}` \n> Joined Server on: `{user.joined_at.strftime('%d %b %Y %H:%M:%S')}` \n> ID: `{user.id}` \n> Is bot?: `{user.bot}`",
+            inline=False
+        )
+        if fetch_user.banner is not None:
+            embed.add_field(
+                name="Profile",
+                value=f"> Avatar: [View]({user.avatar.url})\n> Banner: [View]({fetch_user.banner.url})",
+                inline=False
+            )
+        else:
+            embed.add_field(
+                name="Profile",
+                value=f"> Avatar: [View]({user.avatar.url})\n> Banner: `NONE`",
+                inline=False
+            )
+        roles = " ".join(
+            [role.mention for role in user.roles if role.name != "@everyone"])
+        embed.add_field(
+            name="Server Info",
+            value=f"> Nickname: `{user.nick}` \n> Roles (**{len(user.roles)}**): {roles} @everyone",
+            inline=False
+        )
         embed.set_footer(
             text=f"Requested by {i.user}",
             icon_url=i.user.avatar.url
         )
--        await i.send(embed=embed)
-+        await i.response.send_message(embed=embed)
+        await i.response.send_message(embed=embed)
 
 
 
