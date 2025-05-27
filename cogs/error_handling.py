@@ -23,6 +23,10 @@ class ApplicationCommandError(commands.Cog):
             raise RuntimeError(
                 "GITHUB_APP_ID or GITHUB_APP_INSTALLATION_ID is not set or is not an int"
             ) from exc
+<<<<<<< HEAD
+=======
+        
+>>>>>>> 193f836 (yea)
     @commands.Cog.listener()
     async def on_application_command_error(self, interaction, exception):
         error_message = str(exception)

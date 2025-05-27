@@ -5,6 +5,9 @@ import datetime
 from nextcord.ext import commands
 from nextcord import Interaction, SlashOption
 import pytz
+import asyncio
+import shlex
+import subprocess
 
 
 class SystemCommands(commands.Cog):
@@ -18,7 +21,7 @@ class SystemCommands(commands.Cog):
 
             memory_info = psutil.virtual_memory()
 
-            cpu_usage = psutil.cpu_percent(interval=1)
+            cpu_usage = psutil.cpu_percent(interval=None)
 
             disk_usage = psutil.disk_usage('/')
 
@@ -56,14 +59,18 @@ class SystemCommands(commands.Cog):
                     inline=True
                 )
             except:
-                pass
+                embed.add_field(name="⏰ System Uptime", value="`<unavailable>`", inline=True) 
             
             embed.set_footer(text=f"Requested by {i.user}")
             await i.response.send_message(embed=embed)
         except Exception as e:
             await i.response.send_message(f"Unexpected error: {str(e)}", ephemeral=True)
 
+<<<<<<< HEAD
 import asyncio, shlex, subprocess
+=======
+
+>>>>>>> 193f836 (yea)
 
     @nextcord.slash_command(name="run", description="Run a command in the terminal")
     async def run_command(self, i: Interaction, command: str):
@@ -76,8 +83,13 @@ import asyncio, shlex, subprocess
             if any(dangerous in command.lower() for dangerous in dangerous_commands):
                 await i.response.send_message("Dangerous command detected and blocked.", ephemeral=True)
                 return
+<<<<<<< HEAD
                 
             result = os.popen(command).read()
+=======
+
+            # Run in executor to avoid blocking and bypass a shell
+>>>>>>> 193f836 (yea)
             loop = asyncio.get_running_loop()
             proc = await loop.run_in_executor(
                 None,
@@ -89,10 +101,14 @@ import asyncio, shlex, subprocess
                 ),
             )
             result = proc.stdout or proc.stderr
+<<<<<<< HEAD
             
+=======
+
+>>>>>>> 193f836 (yea)
             if len(result) > 1900:
                 result = result[:1900] + "... (output truncated)"
-            
+
             if result.strip():
                 embed = nextcord.Embed(title="Command Output", color=0x00ff00)
                 embed.add_field(name="Command", value=f"```bash\n{command}```", inline=False)
@@ -102,6 +118,7 @@ import asyncio, shlex, subprocess
                 await i.response.send_message("Command executed successfully (no output)", ephemeral=True)
         except Exception as e:
             await i.response.send_message(f"Unexpected error: {str(e)}", ephemeral=True)
+            
 
     @nextcord.slash_command()
     async def test(self, i: Interaction):

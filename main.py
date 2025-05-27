@@ -37,7 +37,7 @@ perminv = os.getenv("botinv")
 dm_logs = "984869415684284536"
 
 
-bot = commands.Bot(owner_id="399668151475765258", intents=intents, command_prefix=",")
+bot = commands.Bot(owner_id=399668151475765258, intents=intents, command_prefix=",")
 bot.remove_command('help')
 
 
