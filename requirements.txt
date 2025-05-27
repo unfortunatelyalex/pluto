@@ -1,0 +1,9 @@
+aiohttp
+aiosqlite
+nextcord
+python-dotenv
+pytz
+requests
+translate
+psutil
+PyGithub
