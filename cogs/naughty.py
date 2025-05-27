@@ -10,7 +10,7 @@ class NaughtyCommands(commands.Cog):
 
     @nextcord.slash_command(description="It's hentai, you know what hentai is.")
     async def hentai(self, i: Interaction, category: str = SlashOption(name="category", description="The hentai category", choices={"anal": "anal", "blowjob": "blowjob", "cum": "cum", "fuck": "fuck", "neko": "neko", "pussylick": "pussylick", "solo": "solo", "yaoi": "yaoi", "yuri": "yuri"})):
-        if not i.channel.is_nsfw():
+        if not isinstance(i.channel, nextcord.TextChannel) or not i.channel.is_nsfw():
             await i.response.send_message('You can\'t run this command in a non-nsfw channel', ephemeral=True)
             return
         try:
@@ -34,12 +34,16 @@ class NaughtyCommands(commands.Cog):
             return
         try:
             async with aiohttp.ClientSession() as session:
-                async with session.get('https://www.reddit.com/r/nsfw/random.json') as r:
+                headers = {"User-Agent": "PlutoBot/1.0 (+https://github.com/unfortunatelyalex/pluto)"}
+                async with session.get('https://www.reddit.com/r/nsfw/random.json', headers=headers) as r:
                     if r.status == 200:
                         data = await r.json()
                         post_data = data[0]['data']['children'][0]['data']
                         embed = nextcord.Embed(title=post_data['title'], color=0xff69b4)
-                        embed.set_image(url=post_data['url'])
+                        if post_data['url'].endswith((".jpg", ".png", ".gif", ".jpeg", ".webp")):
+                            embed.set_image(url=post_data['url'])
+                        else:
+                            embed.add_field(name="Link", value=post_data['url'], inline=False)
                         embed.set_footer(text=f"⚠️ NSFW Content | 👍 {post_data.get('ups', 0)}")
                         await i.response.send_message(embed=embed)
                     else:

@@ -16,9 +16,13 @@ class ApplicationCommandError(commands.Cog):
         self.bot = bot
         self.github_repo = "unfortunatelyalex/pluto"  # Replace with your GitHub repository
         self.private_key_path = os.getenv('GITHUB_KEY_PATH')
-        self.app_id = os.getenv('GITHUB_APP_ID')
-        self.installation_id = os.getenv('GITHUB_APP_INSTALLATION_ID')
-
+        try:
+            self.app_id = int(os.getenv('GITHUB_APP_ID', ''))
+            self.installation_id = int(os.getenv('GITHUB_APP_INSTALLATION_ID', ''))
+        except ValueError as exc:
+            raise RuntimeError(
+                "GITHUB_APP_ID or GITHUB_APP_INSTALLATION_ID is not set or is not an int"
+            ) from exc
     @commands.Cog.listener()
     async def on_application_command_error(self, interaction, exception):
         error_message = str(exception)
