@@ -9,15 +9,21 @@ class ModerationCommands(commands.Cog):
         self.bot = bot
 
 
-
+    @commands.has_permissions(kick_members=True)
     @nextcord.slash_command(name="kick", description="Kicks a user")
-    async def kick(self, i: Interaction, member: nextcord.Member = SlashOption(description="The member to kick"), reason: str = SlashOption(description="The reason for the kick", required=False)):
+    async def kick(
+        self,
+        i: Interaction,
+        member: nextcord.Member = SlashOption(description="The member to kick"),
+        reason: str = SlashOption(description="The reason for the kick", required=False),
+    ):
         if member == i.user:
-            await i.response.send_message("You can't kick yourself, idiot. *Who hired this guy?*")
+            await i.response.send_message(
+                "You can't kick yourself, idiot. *Who hired this guy?*",
+                ephemeral=True,
+            )
             return
-        if (not i.user.guild_permissions.kick_members):
-            await i.response.send_message(f'{missing_perms}')
-            return
+        
         await member.kick(reason=reason)
         await i.response.send_message(f"{member.mention} has been kicked.")
 

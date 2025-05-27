@@ -1,4 +1,5 @@
 import os
+import pathlib
 import psutil
 import nextcord
 import datetime
@@ -65,7 +66,7 @@ class Info(commands.Cog):
             text=f"Requested by {i.user}",
             icon_url=i.user.avatar.url
         )
-        await i.send(embed=embed)
+        await i.response.send_message(embed=embed)
 
 
 
@@ -116,7 +117,9 @@ class Info(commands.Cog):
             value=f"> CPU usage: {psutil.cpu_percent(interval=1)}% \n> RAM usage: {round(mem)}MB",
             inline=False
         )
-        cogs_dir = '/home/ubuntu/bots/python/pluto/cogs'
+        # derive project root (…/pluto) dynamically
+        BASE_DIR = pathlib.Path(__file__).resolve().parent.parent
+        cogs_dir = BASE_DIR / "cogs"
         line_count = 0
 
         for filename in os.listdir(cogs_dir):
@@ -125,10 +128,9 @@ class Info(commands.Cog):
                 with open(filepath, 'r') as file:
                     line_count += len(file.readlines())
 
-        main_file = '/home/ubuntu/bots/python/pluto/main.py'
+        main_file = BASE_DIR / "main.py"
         with open(main_file, 'r') as file:
             line_count += len(file.readlines())
-
         embed.add_field(
             name="About Me",
             value=f"> Guild count: `{len(self.bot.guilds)}` \n> Line count: `{line_count}` \n> Made by: `alexdot`",

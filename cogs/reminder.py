@@ -1,3 +1,4 @@
+import asyncio
 import aiohttp
 import nextcord
 from nextcord.ext import commands, tasks
@@ -12,6 +13,9 @@ from logging.handlers import RotatingFileHandler
 import logging
 import zoneinfo
 from main import embed_footer
+from dotenv import load_dotenv
+
+load_dotenv(dotenv_path="../.env")
 
 # Configure logging
 LOG_FORMAT = '%(asctime)s - %(levelname)s - %(name)s - %(message)s'
@@ -265,7 +269,7 @@ class ReminderCommand(commands.Cog):
             ntfy_title_actual = title if title else "Reminder!"
 
             headers_ntfy = {
-                "Authorization": "Basic YWxleDpPSHBVOS1raHBVaS1TUVlDRQ==",
+                "Authorization": f"Basic {os.getenv('NTFY_AUTH_TOKEN')}",
                 "Title": ntfy_title_actual,
             }
             if time:
@@ -372,8 +376,10 @@ class ReminderCommand(commands.Cog):
                     await i.response.send_message(embed=error_embed, ephemeral=True)
                 else:
                     await i.followup.send(embed=error_embed, ephemeral=True)
-            except:
-                pass
+            except asyncio.CancelledError:  
+                raise  
+            except Exception:  
+                logger.exception("Failed to send error response in _process_remind")
 
     @tasks.loop(seconds=15) # Check every 15 seconds
     async def check_reminders_loop(self):
