@@ -1,19 +1,10 @@
-# Manually added
-*.bat
-prefixes.json
-*.bak
-*.exe
+.venv
+__pycache__
+.env
+.python-version
+logs
 *.json
-*.txt
-*.db
-*.alex
-*.save
-*.xlsx
-utils.py
-/tempimages
-/pluto slash/
-*.png
-/cogs/
+admin.py
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
