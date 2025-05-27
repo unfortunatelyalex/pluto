@@ -11,11 +11,6 @@ class ModerationCommands(commands.Cog):
 
     @commands.has_permissions(kick_members=True)
     @nextcord.slash_command(name="kick", description="Kicks a user")
-<<<<<<< HEAD
-    @commands.has_permissions(kick_members=True)
-    @nextcord.slash_command(name="kick", description="Kicks a user")
-=======
->>>>>>> 193f836 (yea)
     async def kick(
         self,
         i: Interaction,
@@ -28,11 +23,7 @@ class ModerationCommands(commands.Cog):
                 ephemeral=True,
             )
             return
-<<<<<<< HEAD
-
-=======
         
->>>>>>> 193f836 (yea)
         await member.kick(reason=reason)
         await i.response.send_message(f"{member.mention} has been kicked.")
 

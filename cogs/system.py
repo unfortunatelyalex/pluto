@@ -66,11 +66,6 @@ class SystemCommands(commands.Cog):
         except Exception as e:
             await i.response.send_message(f"Unexpected error: {str(e)}", ephemeral=True)
 
-<<<<<<< HEAD
-import asyncio, shlex, subprocess
-=======
-
->>>>>>> 193f836 (yea)
 
     @nextcord.slash_command(name="run", description="Run a command in the terminal")
     async def run_command(self, i: Interaction, command: str):
@@ -83,13 +78,8 @@ import asyncio, shlex, subprocess
             if any(dangerous in command.lower() for dangerous in dangerous_commands):
                 await i.response.send_message("Dangerous command detected and blocked.", ephemeral=True)
                 return
-<<<<<<< HEAD
-                
-            result = os.popen(command).read()
-=======
 
             # Run in executor to avoid blocking and bypass a shell
->>>>>>> 193f836 (yea)
             loop = asyncio.get_running_loop()
             proc = await loop.run_in_executor(
                 None,
@@ -101,11 +91,6 @@ import asyncio, shlex, subprocess
                 ),
             )
             result = proc.stdout or proc.stderr
-<<<<<<< HEAD
-            
-=======
-
->>>>>>> 193f836 (yea)
             if len(result) > 1900:
                 result = result[:1900] + "... (output truncated)"
 

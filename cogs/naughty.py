@@ -34,27 +34,16 @@ class NaughtyCommands(commands.Cog):
             return
         try:
             async with aiohttp.ClientSession() as session:
-<<<<<<< HEAD
-                headers = {"User-Agent": "PlutoBot/1.0 (+https://github.com/unfortunatelyalex/pluto)"}
-                async with session.get('https://www.reddit.com/r/nsfw/random.json', headers=headers) as r:
-=======
                 headers = {"User-Agent": "PlutoBot/1.0 (+https://github.com/unfortunatelyalex/pluto)"}  
                 async with session.get('https://www.reddit.com/r/nsfw/random.json', headers=headers) as r:
                     
->>>>>>> 193f836 (yea)
                     if r.status == 200:
                         data = await r.json()
                         post_data = data[0]['data']['children'][0]['data']
                         embed = nextcord.Embed(title=post_data['title'], color=0xff69b4)
-<<<<<<< HEAD
-                        if post_data['url'].endswith((".jpg", ".png", ".gif", ".jpeg", ".webp")):
-                            embed.set_image(url=post_data['url'])
-                        else:
-=======
                         if post_data['url'].endswith((".jpg", ".png", ".gif", ".jpeg", ".webp")):  
                             embed.set_image(url=post_data['url'])  
                         else:  
->>>>>>> 193f836 (yea)
                             embed.add_field(name="Link", value=post_data['url'], inline=False)
                         embed.set_footer(text=f"⚠️ NSFW Content | 👍 {post_data.get('ups', 0)}")
                         await i.response.send_message(embed=embed)
