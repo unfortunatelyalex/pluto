@@ -32,6 +32,9 @@ debug_handler.setLevel(logging.DEBUG)
 debug_handler.setFormatter(logging.Formatter(LOG_FORMAT))
 
 def error_filter(record):
+    """
+    Filters log records, allowing only those with level ERROR or higher.
+    """
     return record.levelno >= logging.ERROR
 
 error_handler = RotatingFileHandler(os.path.join(LOG_DIR, "reminder_error.log"), maxBytes=5000000, backupCount=3, encoding="utf-8")
@@ -53,6 +56,11 @@ USER_TZ_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "user_ti
 
 class TimezoneModal(Modal):
     def __init__(self, user_id, callback):
+        """
+        Initializes the TimezoneModal for user timezone input.
+        
+        Creates a modal dialog prompting the user to enter their timezone, storing the user ID and a callback function to handle the submitted value.
+        """
         super().__init__("Set Your Timezone")
         self.user_id = user_id
         self.callback_func = callback
@@ -66,7 +74,11 @@ class TimezoneModal(Modal):
         self.add_item(self.tz_input)
 
     async def callback(self, interaction: Interaction):
-        """Handle timezone input validation"""
+        """
+        Validates the user's timezone input from the modal and handles the result.
+        
+        If the input is a valid timezone, invokes the provided callback with the interaction and timezone. If invalid, sends an ephemeral error embed with example timezones and a retry button. Handles unexpected errors by logging and notifying the user.
+        """
         tz = self.tz_input.value.strip()
         try:
             # Validate the timezone
@@ -76,16 +88,35 @@ class TimezoneModal(Modal):
             # Create retry view with button
             class TryAgainView(View):
                 def __init__(self, user_id, callback_func):
+                    """
+                    Initializes the view with a "Try Again" button for timezone input.
+                    
+                    Args:
+                        user_id: The ID of the user who should interact with the button.
+                        callback_func: The function to call when the user clicks the button.
+                    """
                     super().__init__(timeout=120)
                     self.add_item(TryAgainButton(user_id, callback_func))
                     
             class TryAgainButton(Button):
                 def __init__(self, user_id, callback_func):
+                    """
+                    Initializes the button for retrying timezone input with user and callback context.
+                    
+                    Args:
+                        user_id: The ID of the user who initiated the timezone input.
+                        callback_func: The function to call when the button is pressed.
+                    """
                     super().__init__(label="Try Again", style=nextcord.ButtonStyle.danger)
                     self.user_id = user_id
                     self.callback_func = callback_func
                     
                 async def callback(self, btn_interaction: Interaction):
+                    """
+                    Handles the button interaction for setting a user's timezone.
+                    
+                    If the interacting user matches the intended user, opens the timezone input modal; otherwise, sends an ephemeral error message.
+                    """
                     if btn_interaction.user.id != self.user_id:
                         await btn_interaction.response.send_message("You can't set the timezone for another user!", ephemeral=True)
                         return
@@ -119,6 +150,13 @@ class TimezoneModal(Modal):
 
 class TimezoneView(View):
     def __init__(self, user_id, callback):
+        """
+        Initializes the TimezoneView with a button for setting the user's timezone.
+        
+        Args:
+            user_id: The Discord user ID for whom the timezone is being set.
+            callback: Function to call when the timezone is successfully set.
+        """
         super().__init__(timeout=120)
         self.user_id = user_id
         self.callback_func = callback
@@ -126,11 +164,23 @@ class TimezoneView(View):
 
 class TimezoneButton(Button):
     def __init__(self, user_id, callback):
+        """
+        Initializes a button for users to set their timezone.
+        
+        Args:
+            user_id: The Discord user ID authorized to interact with this button.
+            callback: Function to call when the timezone modal is submitted.
+        """
         super().__init__(label="Set Timezone", style=nextcord.ButtonStyle.primary)
         self.user_id = user_id
         self.callback_func = callback
 
     async def callback(self, interaction: Interaction):
+        """
+        Handles the button click event to initiate timezone setting for the intended user.
+        
+        If the interacting user matches the expected user ID, opens the timezone input modal; otherwise, sends an ephemeral error message.
+        """
         if interaction.user.id != self.user_id:
             await interaction.response.send_message("You can't set the timezone for another user!", ephemeral=True)
             return
@@ -138,6 +188,12 @@ class TimezoneButton(Button):
 
 class ReminderCommand(commands.Cog):
     def __init__(self, bot):
+        """
+        Initializes the ReminderCommand cog, loading reminders from persistent storage and preparing internal state.
+        
+        Args:
+        	bot: The Discord bot instance to which this cog is attached.
+        """
         self.bot = bot
         self.reminders = []
         self._pending_reminders = {}  # user_id: (interaction, args_dict)
@@ -149,6 +205,9 @@ class ReminderCommand(commands.Cog):
             logger.error(f"Error preparing check_reminders_loop in __init__: {e}", exc_info=True)
 
     def cog_unload(self):
+        """
+        Handles cleanup when the cog is unloaded by canceling the reminder checking loop and saving reminders to persistent storage.
+        """
         try:
             self.check_reminders_loop.cancel()
             logger.info("check_reminders_loop cancelled in cog_unload.")
@@ -157,6 +216,12 @@ class ReminderCommand(commands.Cog):
         self._save_reminders()
 
     def _load_user_timezones(self):
+        """
+        Loads user timezone mappings from persistent storage.
+        
+        Returns:
+            A dictionary mapping user IDs to timezone strings. Returns an empty dictionary if the file does not exist or cannot be read.
+        """
         if os.path.exists(USER_TZ_PATH):
             try:
                 with open(USER_TZ_PATH, 'r') as f:
@@ -166,6 +231,12 @@ class ReminderCommand(commands.Cog):
         return {}
 
     def _save_user_timezones(self, tz_dict):
+        """
+        Saves the user timezone mappings to a JSON file.
+        
+        Args:
+            tz_dict: A dictionary mapping user IDs to timezone strings.
+        """
         try:
             with open(USER_TZ_PATH, 'w') as f:
                 json.dump(tz_dict, f, indent=4)
@@ -173,16 +244,36 @@ class ReminderCommand(commands.Cog):
             logger.error(f"Failed to save user timezones: {e}")
 
     def _get_user_timezone(self, user_id):
+        """
+        Retrieves the stored timezone string for a given user ID.
+        
+        Args:
+            user_id: The Discord user ID whose timezone is being requested.
+        
+        Returns:
+            The timezone string if set for the user, otherwise None.
+        """
         tz_dict = self._load_user_timezones()
         return tz_dict.get(str(user_id))
 
     def _set_user_timezone(self, user_id, tz):
+        """
+        Sets the timezone for a user and saves the updated mapping persistently.
+        
+        Args:
+            user_id: The Discord user ID whose timezone is being set.
+            tz: The IANA timezone string to associate with the user.
+        """
         tz_dict = self._load_user_timezones()
         tz_dict[str(user_id)] = tz
         self._save_user_timezones(tz_dict)
 
     async def _ask_timezone(self, interaction, on_timezone_set, pending_args=None):
-        """Ask user to set their timezone before proceeding with reminder"""
+        """
+        Prompts the user to set their timezone before proceeding with a reminder.
+        
+        If the user has not set a timezone, sends an ephemeral embed with instructions and a button to initiate timezone selection. Stores any pending reminder arguments for processing after the timezone is set.
+        """
         try:
             tz_link = "https://en.wikipedia.org/wiki/List_of_tz_database_time_zones"
             
@@ -216,7 +307,11 @@ class ReminderCommand(commands.Cog):
             await interaction.send("An error occurred while setting up timezone selection.", ephemeral=True)
 
     async def _on_timezone_set(self, interaction, tz):
-        """Handle timezone setting and process pending reminder"""
+        """
+        Handles the user's timezone selection, confirms the update, and processes any pending reminder.
+        
+        If the user had a reminder pending due to missing timezone information, this method processes it after setting the timezone. Sends a confirmation or error embed to the user.
+        """
         try:
             self._set_user_timezone(interaction.user.id, tz)
             
@@ -249,6 +344,11 @@ class ReminderCommand(commands.Cog):
             await interaction.send(embed=error_embed, ephemeral=True)
 
     async def _process_remind(self, i, message, time, title, topic, channel):
+        """
+        Processes a reminder request by scheduling a Discord reminder and sending a notification via ntfy.
+        
+        Attempts to parse the provided time string using the user's timezone, schedules a Discord reminder if the time is valid and in the future, and sends a notification to the specified ntfy topic. Responds to the user with an embed summarizing the status of both the Discord reminder and the ntfy notification. Handles invalid channels, time parsing errors, and network or unexpected exceptions with appropriate user feedback.
+        """
         user_tz = self._get_user_timezone(i.user.id)
         logger.info(f"Remind command invoked by {i.user} (ID: {i.user.id}) with time='{time}', message='{message}', title='{title}', topic='{topic}', channel='{channel}'")
         
@@ -380,6 +480,11 @@ class ReminderCommand(commands.Cog):
 
     @tasks.loop(seconds=15) # Check every 15 seconds
     async def check_reminders_loop(self):
+        """
+        Periodically checks for due reminders and sends them as Discord messages.
+        
+        This asynchronous loop runs at regular intervals, processes all reminders whose due time has passed, sends them to the appropriate Discord channels, and removes them from the pending list. Corrupt or malformed reminders are discarded. The updated reminders list is saved if any changes occur.
+        """
         logger.debug("check_reminders_loop: Entered loop iteration.")
         now_utc = datetime.datetime.now(datetime.timezone.utc)
         now_ts = now_utc.timestamp()
@@ -424,6 +529,11 @@ class ReminderCommand(commands.Cog):
 
     @check_reminders_loop.before_loop
     async def before_check_reminders_loop(self):
+        """
+        Waits for the bot to become ready before starting the reminder checking loop.
+        
+        If an exception occurs during the wait, cancels the reminder checking loop.
+        """
         try:
             logger.info("before_check_reminders_loop: Waiting for bot to be ready...")
             await self.bot.wait_until_ready()
@@ -434,6 +544,11 @@ class ReminderCommand(commands.Cog):
 
     @commands.Cog.listener()
     async def on_ready(self):
+        """
+        Handles the bot's on_ready event by ensuring the reminder checking loop is running.
+        
+        Starts the background task for checking and sending due reminders if it is not already active. Logs the status and any errors encountered during startup.
+        """
         logger.info(f"Cog {self.__class__.__name__} received on_ready. Starting check_reminders_loop if not already running.")
         if not self.check_reminders_loop.is_running():
             try:
@@ -447,6 +562,18 @@ class ReminderCommand(commands.Cog):
             logger.info("check_reminders_loop was already running when on_ready was called.")
 
     def _parse_time_to_datetime(self, time_str: str, user_tz: str = None) -> datetime.datetime | None:
+        """
+        Parses a time string into a UTC datetime object, considering the user's timezone.
+        
+        Supports relative times (e.g., "10m", "2h", "1d", "30s"), absolute times (e.g., "16:30", "3pm"), and "tomorrow" prefixes. Returns a timezone-aware UTC datetime if parsing succeeds, or None if the format is invalid.
+        
+        Args:
+            time_str: The time specification string to parse.
+            user_tz: Optional IANA timezone string for the user. Defaults to UTC if not provided or invalid.
+        
+        Returns:
+            A UTC datetime object representing the parsed time, or None if parsing fails.
+        """
         if user_tz:
             try:
                 tzinfo = zoneinfo.ZoneInfo(user_tz)
@@ -523,6 +650,11 @@ class ReminderCommand(commands.Cog):
         return None
 
     def _load_reminders(self):
+        """
+        Loads reminders from the cache file, filtering out malformed entries and initializing the active reminders list.
+        
+        If the cache file is missing or contains invalid data, starts with an empty reminders list.
+        """
         logger.debug(f"Attempting to load reminders from {CACHE_FILE_PATH}")
         if os.path.exists(CACHE_FILE_PATH):
             try:
@@ -560,6 +692,11 @@ class ReminderCommand(commands.Cog):
         logger.info(f"Finished loading. {len(self.reminders)} reminders are active.")
 
     def _save_reminders(self):
+        """
+        Saves the current list of reminders to the persistent JSON cache file.
+        
+        Logs success or error details during the save operation.
+        """
         logger.debug(f"Attempting to save {len(self.reminders)} reminders to {CACHE_FILE_PATH}.")
         try:
             with open(CACHE_FILE_PATH, 'w') as f:
@@ -579,7 +716,12 @@ class ReminderCommand(commands.Cog):
                      topic: str = SlashOption(description="What is the ntfy topic? (default: 'reminders')", required=False),
                      channel: TextChannel = SlashOption(description="Channel for Discord reminder (defaults to current)", required=False, default=None)
                      ):
-        user_tz = self._get_user_timezone(i.user.id)
+        """
+                     Handles the `/remind` slash command to schedule a reminder with optional ntfy notification.
+                     
+                     Prompts the user to set their timezone if not already configured, deferring reminder creation until the timezone is set. Otherwise, processes the reminder immediately with the provided details.
+                     """
+                     user_tz = self._get_user_timezone(i.user.id)
         if not user_tz:
             # Save the original arguments for later processing
             args = dict(i=i, message=message, time=time, title=title, topic=topic, channel=channel)
@@ -589,6 +731,11 @@ class ReminderCommand(commands.Cog):
         await self._process_remind(i=i, message=message, time=time, title=title, topic=topic, channel=channel)
 
     async def _send_discord_reminder(self, reminder_data: dict):
+        """
+        Sends a scheduled reminder as an embedded message to the specified Discord text channel.
+        
+        Attempts to resolve the target channel and user, constructs a reminder embed, and mentions the user in the channel. Handles missing channels, users, and permission errors gracefully, logging any issues encountered.
+        """
         reminder_id = reminder_data['id']
         user_id = reminder_data['user_id']
         channel_id = reminder_data['channel_id']
@@ -672,6 +819,11 @@ class ReminderCommand(commands.Cog):
             logger.error(f"An unexpected error occurred while sending reminder {reminder_id} to {target_channel.id}: {e}", exc_info=True)
 
 def setup(bot):
+    """
+    Initializes and adds the ReminderCommand cog to the Discord bot.
+    
+    Logs the setup process and any errors encountered during cog addition.
+    """
     logger.info("Setting up ReminderCommand cog.")
     try:
         bot.add_cog(ReminderCommand(bot))

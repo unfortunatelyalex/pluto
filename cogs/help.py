@@ -8,6 +8,11 @@ from main import embed_footer
 
 class HelpView(View):
     def __init__(self, bot, interaction_user):
+        """
+        Initializes the HelpView with paginated command data and navigation controls.
+        
+        Sets up the interactive help menu for the invoking user, organizing all application commands into pages and preparing navigation buttons.
+        """
         super().__init__(timeout=180)
         self.bot = bot
         self.interaction_user = interaction_user
@@ -23,6 +28,11 @@ class HelpView(View):
         self.update_buttons()
     
     def update_buttons(self):
+        """
+        Updates the navigation buttons for the help menu based on the current page.
+        
+        Enables or disables the "Previous" and "Next" buttons depending on the current page index, and updates the page indicator to reflect the current page out of the total number of pages.
+        """
         self.clear_items()
         
         # Previous button
@@ -52,6 +62,14 @@ class HelpView(View):
         self.add_item(next_button)
     
     def create_embed(self):
+        """
+        Creates a Discord embed displaying a paginated list of bot commands for the current help page.
+        
+        Each command is shown as a separate field with its mention, category, and a truncated description to fit Discord's embed limits. The embed includes a footer with a global footer text and the total number of commands.
+        
+        Returns:
+            nextcord.Embed: The embed containing the current page of command help information.
+        """
         start_idx = self.current_page * self.commands_per_page
         end_idx = min(start_idx + self.commands_per_page, len(self.commands))
         page_commands = self.commands[start_idx:end_idx]
@@ -104,6 +122,11 @@ class HelpView(View):
         return embed
     
     async def previous_page(self, interaction: Interaction):
+        """
+        Handles the "Previous" button interaction to navigate to the previous help page.
+        
+        If the interaction user is not the original invoker, sends an ephemeral denial message. If already on the first page, defers the interaction without changing the page.
+        """
         if interaction.user != self.interaction_user:
             await interaction.response.send_message("You can't control this help menu!", ephemeral=True)
             return
@@ -116,6 +139,11 @@ class HelpView(View):
             await interaction.response.defer()
     
     async def next_page(self, interaction: Interaction):
+        """
+        Handles the "Next" button interaction to display the next page of the help menu.
+        
+        Advances to the next page if available, updates the navigation buttons, and edits the help message with the new page. Only the user who initiated the help menu can control navigation; others receive an ephemeral denial message.
+        """
         if interaction.user != self.interaction_user:
             await interaction.response.send_message("You can't control this help menu!", ephemeral=True)
             return
@@ -129,16 +157,27 @@ class HelpView(View):
     
     async def on_timeout(self):
         # Disable all buttons when the view times out
+        """
+        Disables all buttons in the view when the interaction times out.
+        """
         for item in self.children:
             item.disabled = True
 
 
 class Help(commands.Cog):
     def __init__(self, bot):
+        """
+        Initializes the Help cog with the provided bot instance.
+        """
         self.bot = bot
 
     @nextcord.slash_command(force_global=True, description="Shows all the commands available")
     async def help(self, i: Interaction):
+        """
+        Sends an interactive paginated help menu displaying all available bot commands.
+        
+        This command presents the user with a navigable help interface, allowing them to browse commands in pages using interactive buttons.
+        """
         view = HelpView(self.bot, i.user)
         embed = view.create_embed()
         await i.response.send_message(embed=embed, view=view)
@@ -146,6 +185,11 @@ class Help(commands.Cog):
     @nextcord.slash_command(name="commandinfo", description="Get detailed information about a specific command")
     async def command_info(self, i: Interaction, command_name: str):
         # Find the command
+        """
+        Sends detailed information about a specific command, including its usage, category, and parameters.
+        
+        If the command is not found, sends an ephemeral message indicating so. Otherwise, displays an embed with the command's name, description, usage, category, and a list of parameters with their types and whether they are required or optional.
+        """
         all_commands = self.bot.get_all_application_commands()
         target_command = None
         
@@ -204,4 +248,7 @@ class Help(commands.Cog):
 
 
 def setup(bot):
+    """
+    Adds the Help cog to the bot, enabling the interactive help and command info system.
+    """
     bot.add_cog(Help(bot))

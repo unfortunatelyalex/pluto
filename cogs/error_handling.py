@@ -13,6 +13,11 @@ load_dotenv()
 
 class ApplicationCommandError(commands.Cog):
     def __init__(self, bot):
+        """
+        Initializes the ApplicationCommandError cog with bot and GitHub integration settings.
+        
+        Loads GitHub repository details and authentication credentials from environment variables for use in automated issue creation.
+        """
         self.bot = bot
         self.github_repo = "unfortunatelyalex/pluto"  # Replace with your GitHub repository
         self.private_key_path = os.getenv('GITHUB_KEY_PATH')
@@ -21,6 +26,15 @@ class ApplicationCommandError(commands.Cog):
 
     @commands.Cog.listener()
     async def on_application_command_error(self, interaction, exception):
+        """
+        Handles errors from application commands by reporting them as GitHub issues.
+        
+        When an error occurs during an application command interaction, this listener captures
+        the exception details, formats a comprehensive report, and attempts to create a new
+        issue in the configured GitHub repository using GitHub App authentication. The user
+        receives an ephemeral message with a link to the created issue or an error message if
+        reporting fails.
+        """
         error_message = str(exception)
         tb = traceback.format_exception(type(exception), exception, exception.__traceback__)
         traceback_str = "".join(tb).strip()
@@ -70,4 +84,7 @@ class ApplicationCommandError(commands.Cog):
             print(f"Unable to open an issue: {e}")
 
 def setup(bot):
+    """
+    Registers the ApplicationCommandError cog with the provided bot instance.
+    """
     bot.add_cog(ApplicationCommandError(bot))

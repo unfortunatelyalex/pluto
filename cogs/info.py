@@ -9,12 +9,20 @@ from nextcord import Interaction, SlashOption
 
 class Info(commands.Cog):
     def __init__(self, bot):
+        """
+        Initializes the Info cog with a reference to the bot instance.
+        """
         self.bot = bot
 
     
 
     @nextcord.slash_command(description="Information about a user")
     async def userinfo(self, i: Interaction, user: nextcord.Member = SlashOption(description='User to get info about', required=False)):
+        """
+        Sends an embed with detailed information about a specified user or the command invoker.
+        
+        If no user is provided, displays information about the command invoker. The embed includes Discord and server join dates, user ID, bot status, avatar and banner URLs (if available), nickname, and a list of roles.
+        """
         if user is None:
             user = i.user
         fetch_user = await self.bot.fetch_user(user.id)
@@ -71,6 +79,11 @@ class Info(commands.Cog):
 
     @nextcord.slash_command(name="avatar", description="Displays a users avatar")
     async def avatar(self, i: Interaction, member: nextcord.Member = SlashOption(description="User to display the avatar of", required=False)):
+        """
+        Displays the avatar of a specified member or the command invoker in an embed.
+        
+        If no member is specified, shows the avatar of the user who invoked the command.
+        """
         if member is None:
             member = i.user
         member_avatar = member.avatar.url
@@ -88,6 +101,11 @@ class Info(commands.Cog):
 
     @nextcord.slash_command(description="Information about the bot")
     async def about(self, i: Interaction):
+        """
+        Sends an embed with information about the bot, including creation date, ID, avatar and banner URLs, host resource usage, source code line count, guild count, and author credit.
+        
+        The embed is styled with the invoking user's name and avatar as the author.
+        """
         embed = nextcord.Embed(title=f'About {self.bot.user.name}', color=0x202225)
         embed.set_thumbnail(
             url=f"{self.bot.user.avatar.url}"
@@ -149,4 +167,10 @@ class Info(commands.Cog):
 
 
 def setup(bot):
+    """
+    Registers the Info cog with the provided bot instance.
+    
+    Args:
+        bot: The Discord bot instance to which the Info cog will be added.
+    """
     bot.add_cog(Info(bot))

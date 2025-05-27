@@ -11,14 +11,33 @@ from   nextcord     import Interaction, ButtonStyle
 
 class Database:
     def __init__(self, filename='session_data.json'):
+        """
+        Initializes the Database instance with the specified JSON filename for session data storage.
+        
+        Args:
+            filename: The name of the JSON file used to persist session data. Defaults to 'session_data.json'.
+        """
         self.filename = filename
 
     def save(self, listening_channel_id, session_name):
+        """
+        Saves the listening channel ID and session name to the session data file.
+        
+        Args:
+            listening_channel_id: The ID of the channel to listen to.
+            session_name: The name of the current session.
+        """
         session_data = {"listening_channel_id": listening_channel_id, "session_name": session_name}
         with open(self.filename, 'w') as f:
             json.dump(session_data, f)
 
     def load(self):
+        """
+        Loads session data from the JSON file.
+        
+        Returns:
+            A tuple containing the listening channel ID and session name.
+        """
         with open(self.filename, 'r') as f:
             session_data = json.load(f)
         return session_data["listening_channel_id"], session_data["session_name"]
@@ -45,6 +64,9 @@ bot.remove_command('help')
 # Ready up message and activity status
 @bot.event
 async def on_ready():
+    """
+    Handles the bot's startup event by setting its presence and sending an online notification embed to a designated log channel.
+    """
     print('--------------------------------')
     print(f"     Logged in as {bot.user} ")
     print(f" User-ID = {bot.user.id}")
@@ -79,6 +101,11 @@ async def on_ready():
 # Deleted message log
 @bot.event
 async def on_message_delete(message):
+    """
+    Handles deleted messages in a specific guild by logging details to a designated channel.
+    
+    If a message is deleted in the guild with ID 791670762859266078, sends an embed to channel 956820109823987712 containing the author, message content, and channel information.
+    """
     if message.guild.id == 791670762859266078:
         channel = bot.get_channel(956820109823987712)
         embed = nextcord.Embed(
@@ -90,6 +117,11 @@ async def on_message_delete(message):
 # Edited message log
 @bot.event
 async def on_message_edit(before, after):
+    """
+    Logs edited messages in a specific guild by sending an embed to a designated channel.
+    
+    If a user (not a bot) edits a message in the specified guild, an embed is sent to the log channel detailing the original and updated message content along with author information.
+    """
     if before.guild.id == 791670762859266078:
         if before.author.bot:
             return
@@ -104,6 +136,11 @@ async def on_message_edit(before, after):
 # Dms from user to a channel
 @bot.event
 async def on_message(message: nextcord.Message):
+    """
+    Handles incoming messages to the bot, logging direct messages and processing commands.
+    
+    If the message is a direct message (DM) from a user and contains media attachments, notifies a designated log channel with the attachment URL and message content. For other DMs, notifies the log channel with the message content. For messages in guilds, processes commands as usual.
+    """
     channel = bot.get_channel(984869415684284536)
     attachment = nextcord.Attachment
     if message.guild is None and not message.author.bot and isinstance(message.attachments, list):

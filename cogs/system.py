@@ -9,10 +9,18 @@ import pytz
 
 class SystemCommands(commands.Cog):
     def __init__(self, bot):
+        """
+        Initializes the SystemCommands cog with a reference to the bot instance.
+        """
         self.bot = bot
 
     @nextcord.slash_command(name="systeminfo", description="Get system load and memory usage")
     async def system_info(self, i: Interaction):
+        """
+        Responds with current system metrics including load averages, CPU usage, memory usage, disk usage, and uptime in an embedded message.
+        
+        Displays system statistics such as load averages (1, 5, and 15 minutes), CPU utilization, memory and disk usage (both as percentages and in gigabytes), and system uptime. Sends the information as an embed in response to the slash command. If an error occurs, sends an ephemeral error message with details.
+        """
         try:
             load1, load5, load15 = os.getloadavg()
 
@@ -65,6 +73,11 @@ class SystemCommands(commands.Cog):
 
     @nextcord.slash_command(name="run", description="Run a command in the terminal")
     async def run_command(self, i: Interaction, command: str):
+        """
+        Executes a terminal command and returns the output, with safety checks and access control.
+        
+        Only a specific user can use this command. Blocks execution of potentially dangerous commands by checking for restricted keywords. If the command produces output, returns it in an embed; otherwise, sends a success message. Output is truncated if it exceeds 1900 characters. On error, sends an ephemeral error message.
+        """
         if i.user.id != 399668151475765258:
             await i.response.send_message("You do not have permission to use this command.", ephemeral=True)
             return
@@ -92,6 +105,11 @@ class SystemCommands(commands.Cog):
 
     @nextcord.slash_command()
     async def test(self, i: Interaction):
+        """
+        Sends an embed displaying the interaction creation time in both UTC and Central European Time.
+        
+        The embed includes formatted timestamps for UTC and CET, along with the requesting user's information in the footer.
+        """
         utc_time = i.created_at
         cet_time = utc_time.astimezone(pytz.timezone('Europe/Berlin'))
         
@@ -103,4 +121,7 @@ class SystemCommands(commands.Cog):
 
 
 def setup(bot):
+    """
+    Registers the SystemCommands cog with the provided bot instance.
+    """
     bot.add_cog(SystemCommands(bot))
