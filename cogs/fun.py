@@ -40,21 +40,9 @@ class FunCommands(commands.Cog):
     async def cat(self, i: Interaction):
         try:
             async with aiohttp.ClientSession() as session:
-                async with session.get('https://aws.random.cat/meow') as r:
+                async with session.get('https://api.thecatapi.com/v1/images/search') as r:
                     data = await r.json()
-                    await i.response.send_message(data['file'])
-        except Exception as e:
-            await i.response.send_message(f'{e}')
-
-
-
-    @nextcord.slash_command(name="meme", description="Posts a random meme from the dankmemes subreddit")
-    async def meme(self, i: Interaction):
-        try:
-            async with aiohttp.ClientSession() as session:
-                async with session.get('https://www.reddit.com/r/memes/random.json') as r:
-                    data = await r.json()
-                    await i.response.send_message(data[0]['data']['children'][0]['data']['url'])
+                    await i.response.send_message(data[0]['url'])
         except Exception as e:
             await i.response.send_message(f'{e}')
 
