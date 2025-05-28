@@ -42,7 +42,10 @@ class FunCommands(commands.Cog):
             async with aiohttp.ClientSession() as session:
                 async with session.get('https://api.thecatapi.com/v1/images/search') as r:
                     data = await r.json()
-                    await i.response.send_message(data[0]['url'])
+                    if isinstance(data, list) and len(data) > 0 and 'url' in data[0]:
+                        await i.response.send_message(data[0]['url'])
+                    else:
+                        await i.response.send_message("The API response is invalid or does not contain a valid URL.")
         except Exception as e:
             await i.response.send_message(f'{e}')
 

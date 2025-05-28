@@ -312,7 +312,8 @@ class ReminderCommand(commands.Cog):
                 
                 # Check if this is an instant reminder (due time is now or in the past)
                 time_diff = (due_datetime_discord - current_utc_time).total_seconds()
-                if time_diff <= 1:  # Within 1 second, treat as instant
+                INSTANT_REMINDER_THRESHOLD = 1  # Threshold in seconds for instant reminders
+                if time_diff <= INSTANT_REMINDER_THRESHOLD:  # Within threshold, treat as instant
                     logger.info(f"Processing instant reminder for user {i.user.id}")
                     # Create reminder data for immediate sending
                     instant_reminder_data = {
