@@ -272,7 +272,12 @@ class ReminderCommand(commands.Cog):
                 "Authorization": f"Basic {os.getenv('NTFY_AUTH_TOKEN')}",
                 "Title": ntfy_title_actual,
             }
-            if time:
+            
+            # Check if this is an instant reminder - if so, don't add the "In" header
+            time_str_lower = time.lower().strip() if time else ""
+            is_instant = time_str_lower in ["0", "0s", "0sec", "0second", "0seconds", "0m", "0min", "0minute", "0minutes", "now", "instant"]
+            
+            if time and not is_instant:
                 headers_ntfy["In"] = time 
 
             ntfy_url = f"https://ntfy.alexdot.me/{ntfy_topic_actual}"
@@ -304,7 +309,32 @@ class ReminderCommand(commands.Cog):
             if due_datetime_discord:
                 current_utc_time = datetime.datetime.now(datetime.timezone.utc)
                 logger.debug(f"Comparing due_datetime_discord ({due_datetime_discord.isoformat()}) with current_utc_time ({current_utc_time.isoformat()})")
-                if due_datetime_discord > current_utc_time:
+                
+                # Check if this is an instant reminder (due time is now or in the past)
+                time_diff = (due_datetime_discord - current_utc_time).total_seconds()
+                INSTANT_REMINDER_THRESHOLD = 1  # Threshold in seconds for instant reminders
+                if time_diff <= INSTANT_REMINDER_THRESHOLD:  # Within threshold, treat as instant
+                    logger.info(f"Processing instant reminder for user {i.user.id}")
+                    # Create reminder data for immediate sending
+                    instant_reminder_data = {
+                        "id": str(uuid.uuid4()),
+                        "user_id": i.user.id,
+                        "channel_id": target_discord_channel.id,
+                        "guild_id": i.guild.id if i.guild else None,
+                        "title": ntfy_title_actual,
+                        "message": message,
+                        "due_timestamp": current_utc_time.timestamp(),
+                        "original_time_str": time,
+                    }
+                    try:
+                        await self._send_discord_reminder(instant_reminder_data)
+                        discord_reminder_scheduled_msg = f"Discord reminder sent instantly in {target_discord_channel.mention}."
+                        logger.info(f"Successfully sent instant Discord reminder for user {i.user.id}.")
+                    except Exception as e:
+                        logger.error(f"Failed to send instant Discord reminder for user {i.user.id}: {e}", exc_info=True)
+                        discord_reminder_scheduled_msg = "Failed to send instant Discord reminder."
+                        success_color = warning_color
+                elif due_datetime_discord > current_utc_time:
                     reminder_id = str(uuid.uuid4())
                     reminder_data = {
                         "id": reminder_id,
@@ -462,6 +492,11 @@ class ReminderCommand(commands.Cog):
         
         time_str_lower = time_str.lower().strip()
 
+        # Check for instant reminder (0 or variations)
+        if time_str_lower in ["0", "0s", "0sec", "0second", "0seconds", "0m", "0min", "0minute", "0minutes", "now", "instant"]:
+            logger.debug(f"Parsed '{time_str}' as instant reminder (0 delay)")
+            return now.astimezone(datetime.timezone.utc)
+
         patterns = [
             (r"(\d+)\s*s(?:ec(?:ond)?s?)?", datetime.timedelta(seconds=1)),
             (r"(\d+)\s*m(?:in(?:ute)?s?)?", datetime.timedelta(minutes=1)),
@@ -474,6 +509,10 @@ class ReminderCommand(commands.Cog):
             if match:
                 try:
                     value = int(match.group(1))
+                    # Handle zero values for any unit as instant
+                    if value == 0:
+                        logger.debug(f"Parsed '{time_str}' as instant reminder (0 value for time unit)")
+                        return now.astimezone(datetime.timezone.utc)
                     parsed_dt = now + delta_unit * value
                     logger.debug(f"Parsed '{time_str}' as relative time ({value} units of {delta_unit}) to: {parsed_dt.isoformat()}")
                     return parsed_dt.astimezone(datetime.timezone.utc)
@@ -577,7 +616,7 @@ class ReminderCommand(commands.Cog):
     async def remind(self,
                      i: Interaction,
                      message: str = SlashOption(description="What do you want to be reminded about?", required=True),
-                     time: str = SlashOption(description="When? (e.g. '10m', '2h', '1d', 'tomorrow 3pm', '17:00')", required=True),
+                     time: str = SlashOption(description="When? (e.g. '10m', '2h', '1d', 'tomorrow 3pm', '17:00', '0' for instant)", required=True),
                      title: str = SlashOption(description="What should the title be?", required=False),
                      topic: str = SlashOption(description="What is the ntfy topic? (default: 'reminders')", required=False),
                      channel: TextChannel = SlashOption(description="Channel for Discord reminder (defaults to current)", required=False, default=None)

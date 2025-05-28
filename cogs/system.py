@@ -84,10 +84,12 @@ class SystemCommands(commands.Cog):
             proc = await loop.run_in_executor(
                 None,
                 lambda: subprocess.run(
-                    shlex.split(command),
+                    command,
                     capture_output=True,
+                    executable="/usr/bin/zsh",
                     text=True,
                     timeout=10,
+                    shell=True,
                 ),
             )
             result = proc.stdout or proc.stderr
