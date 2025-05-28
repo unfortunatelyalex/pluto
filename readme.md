@@ -1,44 +1,82 @@
-# pluto
-### What is pluto?
-pluto is my personal discord bot I wrote in order to help me "manage" my server a bit better and just wanting to code a discord bot in general.
-And who knows, maybe it will be a public bot in the future.
- 
-### pluto's functionalities
-1. Clearing messages.
-2. Showing avatars of users in the same discord server with him.
-3. Showing the users account information.
-4. Adjusting his prefix to your liking.
-5. A nice little leveling system.
-6. Show sweet little cat/dog pictures
-7. Scan files with Virustotal
-8. Send stupid memes from reddit
-9. hentai :(
-10. pluto can roast your your mom
-11. Kick/ban members
-12. If you have alzheimer you can even let pluto remind you of something
+# Pluto Discord Bot
 
-### Commands that you can't use
-1. Restarting the bot.
-2. Blinding users.
+## What is Pluto?
+Pluto is a personal Discord bot designed to manage servers, provide fun and utility commands, and automate common tasks. Originally for personal use, Pluto has grown to include a wide range of features and may become public in the future.
 
-### What pluto won't do
-1. Explain the aerodynamics of a cow.
+---
 
-______________
+## Features
 
-## Planned features
+### Moderation
+- **Kick/Ban Members**: Remove problematic users from your server.
+- **Clear/Purge Messages**: Bulk delete messages or purge entire channels.
+- **NSFW Content Restriction**: NSFW commands only work in NSFW channels.
 
-### Music functionality
-<details>
-    <summary>Spotify / Youtube</summary>
+### Fun & Entertainment
+- **Roast Me**: Get a random roast from a curated list.
+- **Random Dog Pictures**: Fetches random dog images from a public API.
+- **Random Cat Pictures**: Fetches random cat images from a public API.
+- **Random Jokes**: Get a random joke from an online API.
+- **NSFW Hentai**: Fetches NSFW images/GIFs from Purrbot (works only in NSFW channels).
 
-Casual music bot things :)
+### Information
+- **User Info**: Get detailed information about a user (join date, roles, avatar, etc.).
+- **Avatar**: Display a user's avatar.
+- **Bot Info**: Information about Pluto, including stats and author.
+- **System Info**: View system load, memory, CPU, and disk usage.
 
-</details>
+### Utilities
+- **Reminders**: Set reminders for yourself, with support for timezones and instant reminders. Reminders can be sent both in Discord and via ntfy notifications.
+- **Run Command**: `/run` (owner only) – run shell commands directly from Discord (with safety checks).
+- **Time Test**: See the current UTC and CET time.
 
-### Chat log
-<details>
-    <summary>Logging deleted messages</summary>
+### Help & Error Handling
+- **Help Menu**: Paginated help command listing all available commands.
+- **Command Info**: Get detailed info about a specific command.
+- **Automatic Error Reporting**: Errors are reported and can be sent to GitHub as issues (if configured and set up properly (that includes setting up a github bot and a personal access token)).
 
-I already have that but the log channel is defined within the code, planned is to set the log channel with a command. :)
-</details>
+---
+
+## Example Commands
+| Command                                           | Description                                 |
+| ------------------------------------------------- | ------------------------------------------- |
+| `/kick <member> [reason]`                         | Kick a user                                 |
+| `/ban <member> [reason]`                          | Ban a user                                  |
+| `/clear <amount>`                                 | Delete a number of messages                 |
+| `/purge`                                          | Purge all messages in a channel             |
+| `/roastme`                                        | Get roasted                                 |
+| `/dog`                                            | Random dog picture                          |
+| `/cat`                                            | Random cat picture                          |
+| `/joke`                                           | Random joke                                 |
+| `/hentai <category>`                              | NSFW image/gif (NSFW channels only)         |
+| `/userinfo [user]`                                | Info about a user                           |
+| `/avatar [user]`                                  | Show a user's avatar                        |
+| `/about`                                          | Info about Pluto                            |
+| `/systeminfo`                                     | System stats                                |
+| `/remind <message> <time> [title] [topic] [channel]` | Set a reminder (supports instant reminders with `0`) |
+| `/run <command>`                                  | Run a shell command (owner only)            |
+| `/help`                                           | Show all commands                           |
+| `/commandinfo <command>`                          | Info about a specific command               |
+
+---
+
+## Planned Features (I don't know when)
+- **Music Functionality**: Spotify/Youtube playback and music bot features.
+- **Configurable Chat Log**: Set log channels for deleted messages via command.
+
+---
+
+## What Pluto Will Not Do
+- Explain the aerodynamics of a cow.
+
+---
+
+## Notes
+- Some commands are restricted to server admins or the bot owner.
+- NSFW commands require an NSFW channel.
+- Error handling is robust and can create GitHub issues for unhandled exceptions (if configured correctly).
+
+---
+
+## Author
+- Made by [`alexdot`](https://github.com/unfortunatelyalex)
