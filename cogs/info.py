@@ -40,7 +40,7 @@ class Info(commands.Cog):
             )
         embed.add_field(
             name="General Info",
-            value=f"> Joined Discord on `{user.created_at.strftime('%d %b %Y %H:%M:%S')}` \n> Joined Server on: `{user.joined_at.strftime('%d %b %Y %H:%M:%S')}` \n> ID: `{user.id}` \n> Is bot?: `{user.bot}`",
+            value=f"> Joined Discord on `{user.created_at.strftime('%d %b %Y %H:%M:%S')}` \n> Joined Server on: `{user.joined_at.strftime('%d %b %Y %H:%M:%S') if hasattr(user, 'joined_at') and user.joined_at is not None else 'Not in server'}` \n> ID: `{user.id}` \n> Is bot?: `{user.bot}`",
             inline=False
         )
         if fetch_user.banner is not None:
@@ -55,13 +55,15 @@ class Info(commands.Cog):
                 value=f"> Avatar: [View]({user.avatar.url})\n> Banner: `NONE`",
                 inline=False
             )
-        roles = " ".join(
-            [role.mention for role in user.roles if role.name != "@everyone"])
-        embed.add_field(
-            name="Server Info",
-            value=f"> Nickname: `{user.nick}` \n> Roles (**{len(user.roles)}**): {roles} @everyone",
-            inline=False
-        )
+        # Server Info section - only show if user is a server member
+        if hasattr(user, 'roles') and hasattr(user, 'nick'):
+            roles = " ".join(
+                [role.mention for role in user.roles if role.name != "@everyone"])
+            embed.add_field(
+                name="Server Info",
+                value=f"> Nickname: `{user.nick}` \n> Roles (**{len(user.roles)}**): {roles} @everyone",
+                inline=False
+            )
         embed.set_footer(
             text=f"Requested by {i.user}",
             icon_url=i.user.avatar.url
