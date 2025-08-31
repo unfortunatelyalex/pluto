@@ -44,15 +44,17 @@ class Info(commands.Cog):
             inline=False
         )
         if fetch_user.banner is not None:
+            avatar_url = user.avatar.url if user.avatar is not None else user.default_avatar.url
             embed.add_field(
                 name="Profile",
-                value=f"> Avatar: [View]({user.avatar.url})\n> Banner: [View]({fetch_user.banner.url})",
+                value=f"> Avatar: [View]({avatar_url})\n> Banner: [View]({fetch_user.banner.url})",
                 inline=False
             )
         else:
+            avatar_url = user.avatar.url if user.avatar is not None else user.default_avatar.url
             embed.add_field(
                 name="Profile",
-                value=f"> Avatar: [View]({user.avatar.url})\n> Banner: `NONE`",
+                value=f"> Avatar: [View]({avatar_url})\n> Banner: `NONE`",
                 inline=False
             )
         # Server Info section - only show if user is a server member
@@ -64,9 +66,10 @@ class Info(commands.Cog):
                 value=f"> Nickname: `{user.nick}` \n> Roles (**{len(user.roles)}**): {roles} @everyone",
                 inline=False
             )
+        footer_icon_url = i.user.avatar.url if i.user.avatar is not None else i.user.default_avatar.url
         embed.set_footer(
             text=f"Requested by {i.user}",
-            icon_url=i.user.avatar.url
+            icon_url=footer_icon_url
         )
         await i.response.send_message(embed=embed)
 
@@ -76,7 +79,7 @@ class Info(commands.Cog):
     async def avatar(self, i: Interaction, member: nextcord.Member = SlashOption(description="User to display the avatar of", required=False)):
         if member is None:
             member = i.user
-        member_avatar = member.avatar.url
+        member_avatar = member.avatar.url if member.avatar is not None else member.default_avatar.url
 
         avatar_embed = nextcord.Embed(
             title=f"{member.name}'s Avatar", timestamp=datetime.datetime.now(datetime.timezone.utc))
