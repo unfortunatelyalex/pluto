@@ -8,6 +8,32 @@ from nextcord.ext import commands
 from nextcord import Interaction, SlashOption
 
 
+def _safe_user(obj):
+    """Return the user/member object or None."""
+    return obj if obj is not None else None
+
+
+def _avatar_url(user) -> str | None:
+    """Best-effort retrieval of a user's avatar (or default avatar) URL.
+
+    Handles cases where user or its avatar attributes may be None to satisfy
+    static analysis complaining about potential None attributes.
+    """
+    if user is None:
+        return None
+    avatar = getattr(user, "avatar", None)
+    if avatar is not None:
+        return getattr(avatar, "url", None)
+    default_avatar = getattr(user, "default_avatar", None)
+    if default_avatar is not None:
+        return getattr(default_avatar, "url", None)
+    return None
+
+
+def _user_name(user) -> str:
+    return getattr(user, "name", "Unknown")
+
+
 class Info(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
@@ -28,12 +54,13 @@ class Info(commands.Cog):
             embed.set_thumbnail(url=f"{user.avatar.url}")
         else:
             embed.set_thumbnail(url=f"{user.default_avatar.url}")
-        if i.user.avatar is not None:
-            embed.set_author(name=f"{i.user.name}", icon_url=f"{i.user.avatar.url}")
+        requester = _safe_user(getattr(i, "user", None))
+        requester_name = _user_name(requester)
+        requester_avatar = _avatar_url(requester)
+        if requester_avatar:
+            embed.set_author(name=requester_name, icon_url=requester_avatar)
         else:
-            embed.set_author(
-                name=f"{i.user.name}", icon_url=f"{i.user.default_avatar.url}"
-            )
+            embed.set_author(name=requester_name)
         embed.add_field(
             name="General Info",
             value=f"> Joined Discord on `{user.created_at.strftime('%d %b %Y %H:%M:%S')}` \n> Joined Server on: `{user.joined_at.strftime('%d %b %Y %H:%M:%S') if hasattr(user, 'joined_at') and user.joined_at is not None else 'Not in server'}` \n> ID: `{user.id}` \n> Is bot?: `{user.bot}`",
@@ -62,12 +89,12 @@ class Info(commands.Cog):
                 value=f"> Nickname: `{user.nick}` \n> Roles (**{len(user.roles)}**): {roles} @everyone",
                 inline=False,
             )
-        footer_icon_url = (
-            i.user.avatar.url
-            if i.user.avatar is not None
-            else i.user.default_avatar.url
-        )
-        embed.set_footer(text=f"Requested by {i.user}", icon_url=footer_icon_url)
+        footer_user = requester
+        footer_icon_url = _avatar_url(footer_user)
+        if footer_icon_url:
+            embed.set_footer(text=f"Requested by {footer_user}", icon_url=footer_icon_url)
+        else:
+            embed.set_footer(text=f"Requested by {footer_user}")
         await i.response.send_message(embed=embed)
 
     @nextcord.slash_command(name="avatar", description="Displays a users avatar")
@@ -91,9 +118,11 @@ class Info(commands.Cog):
             timestamp=datetime.datetime.now(datetime.timezone.utc),
         )
         avatar_embed.set_image(url=member_avatar)
-        avatar_embed.set_footer(
-            text=f"{embed_footer}", icon_url=f"{self.bot.user.avatar.url}"
-        )
+        bot_avatar = _avatar_url(getattr(self.bot, "user", None))
+        if bot_avatar:
+            avatar_embed.set_footer(text=f"{embed_footer}", icon_url=bot_avatar)
+        else:
+            avatar_embed.set_footer(text=f"{embed_footer}")
 
         await i.response.send_message(embed=avatar_embed)
         return
@@ -145,12 +174,13 @@ class Info(commands.Cog):
             value=f"> Guild count: `{len(self.bot.guilds)}` \n> Line count: `{line_count}` \n> Made by: `alexdot`",
             inline=False,
         )
-        if i.user.avatar is not None:
-            embed.set_author(name=f"{i.user.name}", icon_url=f"{i.user.avatar.url}")
+        requester = _safe_user(getattr(i, "user", None))
+        requester_name = _user_name(requester)
+        requester_avatar = _avatar_url(requester)
+        if requester_avatar:
+            embed.set_author(name=requester_name, icon_url=requester_avatar)
         else:
-            embed.set_author(
-                name=f"{i.user.name}", icon_url=f"{i.user.default_avatar.url}"
-            )
+            embed.set_author(name=requester_name)
         await i.send(embed=embed)
 
 
