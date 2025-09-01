@@ -92,7 +92,9 @@ class Info(commands.Cog):
         footer_user = requester
         footer_icon_url = _avatar_url(footer_user)
         if footer_icon_url:
-            embed.set_footer(text=f"Requested by {footer_user}", icon_url=footer_icon_url)
+            embed.set_footer(
+                text=f"Requested by {footer_user}", icon_url=footer_icon_url
+            )
         else:
             embed.set_footer(text=f"Requested by {footer_user}")
         await i.response.send_message(embed=embed)
